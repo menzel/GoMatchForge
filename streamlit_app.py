@@ -398,7 +398,7 @@ def optimal_matchups(users: pd.DataFrame, hist: pd.DataFrame) -> tuple[list, str
         if total < best_total:
             best_total, best_matches, best_bye = total, pairs, players[bye_idx]["name"]
 
-    return best_matches
+    return best_matches, best_bye
 
 def best_matchups(users: pd.DataFrame, hist: pd.DataFrame) -> list:
     print(users)
@@ -569,7 +569,7 @@ with st.sidebar:
             push_players()
 
             # 2. Generate matches
-            matches = optimal_matchups(st.session_state.users, st.session_state.history)
+            matches, bye = optimal_matchups(st.session_state.users, st.session_state.history)
             if matches:
                 new_rows = pd.DataFrame([{
                     "player1":  m["Player 1"],
