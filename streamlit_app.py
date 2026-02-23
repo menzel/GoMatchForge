@@ -99,7 +99,7 @@ DAN_RANKS = [f"{d}d" for d in range(1, 10)]
 ALL_RANKS = KYU_RANKS + DAN_RANKS  # 30k(idx0,val1) … 9d(idx38,val39)
 
 def rank_to_int(r: str) -> int:
-    try:    return min(18,ALL_RANKS.index(str(r)) + 1)
+    try:    return max(10,ALL_RANKS.index(str(r)) + 1)
     except: return 1
 
 def rank_display(r: str) -> str:
