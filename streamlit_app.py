@@ -468,7 +468,7 @@ with st.sidebar:
         <span style='color:var(--text)'>{h}h {m}m away</span>
     </div>""", unsafe_allow_html=True)
 
-    t.write(st.info)
+    st.write(st.info)
     # ── Run pairing
     if st.button("▶ RUN PAIRING NOW"):
         sun    = current_sunday()
