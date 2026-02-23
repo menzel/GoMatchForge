@@ -610,7 +610,7 @@ tab0,tab1,tab2,tab3,tab4 = st.tabs([
     "📅 Weekly Results","🏆 Next Matchups","📊 Penalty Matrix","🔢 All Combinations","👥 Players"
 ])
 
-
+st.write(st.secrets)
 # ═══ TAB 0 — Weekly Results ═══════════════════════════════════════════════════
 with tab0:
     st.markdown("## Weekly Results")
