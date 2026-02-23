@@ -287,10 +287,10 @@ def prev_plays(p1: str, p2: str, hist: pd.DataFrame) -> int:
 
 def penalty(p1d: dict, p2d: dict, hist: pd.DataFrame) -> int:
     tz = abs(p1d["timezone"] - p2d["timezone"])
-    tp = 2 if tz>10 else (1 if tz>4 else 0)
+    tp = 8 if tz>10 else (3 if tz>4 else 0)
     rp = abs(rank_to_int(p1d["rank"]) - rank_to_int(p2d["rank"]))
     hp = prev_plays(p1d["name"], p2d["name"], hist)
-    return tp + rp + hp
+    return tp + rp + 4*hp
 
 def build_matrix(users: pd.DataFrame, hist: pd.DataFrame) -> pd.DataFrame:
     act   = users[users.status=="active"].reset_index(drop=True)
