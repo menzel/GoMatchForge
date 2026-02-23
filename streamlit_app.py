@@ -316,12 +316,11 @@ def all_combos(users: pd.DataFrame, hist: pd.DataFrame) -> pd.DataFrame:
             "Prev Games":prev_plays(p1["name"],p2["name"],hist),
             "Penalty":pen,
         })
-    print(rows)
-    print(pd.DataFrame(rows))
-    print(act)
     return pd.DataFrame(rows).sort_values("Penalty").reset_index(drop=True)
 
 def best_matchups(users: pd.DataFrame, hist: pd.DataFrame) -> list:
+    print(users)
+    print(hist)
     combos = all_combos(users, hist)
     used, matches = set(), []
     for _,r in combos.iterrows():
