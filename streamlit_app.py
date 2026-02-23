@@ -615,8 +615,8 @@ c4.markdown(f"<div class='metric-card' style='border-left-color:var(--warn);'><d
 
 st.markdown("<hr class='section-divider'>", unsafe_allow_html=True)
 
-tab0,tab1,tab2,tab3,tab4 = st.tabs([
-    "📅 Weekly Results","🏆 Next Matchups","📊 Penalty Matrix","🔢 All Combinations","👥 Players"
+tab0,tab2,tab3,tab4 = st.tabs([
+    "🏆 Weekly Results","📊 Penalty Matrix","🔢 All Combinations","👥 Players"
 ])
 
 
@@ -695,55 +695,6 @@ with tab0:
                 </div>
                 """, unsafe_allow_html=True)
 
-
-# ═══ TAB 1 — Next Matchups ════════════════════════════════════════════════════
-with tab1:
-    st.markdown("## Next Matchups")
-    st.markdown(f"""<div class='info-box'>
-        Pairings run every <strong>Sunday at 12:00 UTC</strong>. Before pairing, players who haven't
-        played in the past 7 days are set <strong>inactive</strong>.
-        Next run: <span style='color:var(--accent)'>{next_sunday_noon().strftime("%A %d %b %Y, %H:%M UTC")}</span>
-    </div>""", unsafe_allow_html=True)
-
-    if len(active) < 2:
-        st.warning("Need at least 2 active players.")
-    else:
-        matches = best_matchups(users, history)
-        if not matches:
-            st.info("No pairings available.")
-        else:
-            total_pen = sum(m["Penalty"] for m in matches)
-            st.markdown(f"""<div class='metric-card' style='margin-bottom:1.5rem;border-left-color:var(--accent2);'>
-                <div class='label'>Total Schedule Penalty</div>
-                <div class='value' style='color:var(--accent2)'>{total_pen}</div>
-            </div>""", unsafe_allow_html=True)
-
-            for m in matches:
-                cc = pcc(int(m["Penalty"]))
-                st.markdown(f"""
-                <div class='match-card best'>
-                    <div class='match-top'>
-                        <div class='match-players'>
-                            <span class='match-player'>{m["Player 1"]}</span>
-                            <span style='margin:0 .4rem'>{rank_display(m["Rank 1"])}</span>
-                            <span class='vs'>VS</span>
-                            <span class='match-player'>{m["Player 2"]}</span>
-                            <span style='margin:0 .4rem'>{rank_display(m["Rank 2"])}</span>
-                        </div>
-                        <div style='display:flex;gap:.5rem;align-items:center;'>
-                            <span style='font-family:DM Mono,monospace;font-size:.75rem;color:var(--muted)'>
-                                TZ±{m["TZ Diff"]}h &middot; Rank±{m["Rank Diff"]} &middot; {m["Prev Games"]} prev
-                            </span>
-                            <span class='penalty-badge {cc}'>Penalty: {int(m["Penalty"])}</span>
-                        </div>
-                    </div>
-                </div>""", unsafe_allow_html=True)
-
-            unmatched = set(active.name) - {p for m in matches for p in [m["Player 1"],m["Player 2"]]}
-            if unmatched:
-                st.markdown(f"""<div class='info-box' style='margin-top:1rem;'>
-                    ⚠️ Odd player out — <strong>{", ".join(unmatched)}</strong> has no match this week.
-                </div>""", unsafe_allow_html=True)
 
 
 # ═══ TAB 2 — Penalty Matrix ═══════════════════════════════════════════════════
