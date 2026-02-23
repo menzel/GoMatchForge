@@ -331,17 +331,25 @@ def _build_cost_matrix(players: list[dict], hist: pd.DataFrame) -> np.ndarray:
     return mat
 
 
-def optimal_matchups(users: pd.DataFrame, hist: pd.DataFrame) -> tuple[list, int | None]:
+def optimal_matchups(users: pd.DataFrame, hist: pd.DataFrame) -> tuple[list, str | None]:
     """
-    Hungarian algorithm (scipy.optimize.linear_sum_assignment) for globally
-    optimal minimum-penalty matching.
+    Globally optimal minimum-penalty matching using the Blossom V algorithm
+    (NetworkX implementation), which correctly handles general (non-bipartite)
+    graphs where every player can be matched with any other player.
 
-    For odd player counts every possible 'bye' player is tried and the
-    assignment with the lowest total penalty wins.
+    linear_sum_assignment (Hungarian) solves bipartite assignment — it treats
+    rows and columns as two distinct sets, so player A in row 2 and player A
+    in column 2 are considered different nodes. This means it can legally
+    "match A with A" or double-count players. Blossom works on a true
+    undirected graph and is the correct algorithm for this problem.
+
+    For odd player counts: each player is tried as the bye candidate, Blossom
+    is solved on the remaining even pool, and the configuration with the
+    lowest total penalty wins.
 
     Returns (matches: list[dict], bye_player: str | None)
     """
-    from scipy.optimize import linear_sum_assignment
+    import networkx as nx
 
     act     = users[users.status == "active"].reset_index(drop=True)
     players = act.to_dict("records")
@@ -350,49 +358,47 @@ def optimal_matchups(users: pd.DataFrame, hist: pd.DataFrame) -> tuple[list, int
     if n < 2:
         return [], None
 
-    def _solve_with_bye(pool: list[dict]) -> tuple[list, float]:
-        """Run Hungarian on an even-sized pool; return (matches, total_penalty)."""
-        k    = len(pool)
-        cost = _build_cost_matrix(pool, hist)
-        # Make symmetric self-pairs impossible
-        np.fill_diagonal(cost, 1e9)
-        row_ind, col_ind = linear_sum_assignment(cost)
+    def _solve_with_pool(pool: list[dict]) -> tuple[list, float]:
+        """Run min-weight perfect matching on an even-sized pool."""
+        G = nx.Graph()
+        G.add_nodes_from(range(len(pool)))
 
-        seen, pairs = set(), []
-        total = 0.0
-        for r, c in zip(row_ind, col_ind):
-            if r in seen or c in seen or r == c:
-                continue
-            seen.add(r); seen.add(c)
-            p = cost[r, c]
-            total += p
-            p1, p2 = pool[r], pool[c]
+        for i, j in itertools.combinations(range(len(pool)), 2):
+            pen = penalty(pool[i], pool[j], hist)
+            # NetworkX max_weight_matching maximises, so negate penalty.
+            # Use a large constant minus penalty so weights stay positive.
+            G.add_edge(i, j, weight=1000 - pen)
+
+        matching = nx.max_weight_matching(G, maxcardinality=True, weight="weight")
+
+        pairs, total = [], 0.0
+        for i, j in matching:
+            p1, p2 = pool[i], pool[j]
+            pen    = penalty(p1, p2, hist)
+            total += pen
             pairs.append({
-                "Player 1": p1["name"], "Rank 1": p1["rank"],
-                "Player 2": p2["name"], "Rank 2": p2["rank"],
-                "TZ Diff":  abs(p1["timezone"] - p2["timezone"]),
+                "Player 1":  p1["name"],  "Rank 1": p1["rank"],
+                "Player 2":  p2["name"],  "Rank 2": p2["rank"],
+                "TZ Diff":   abs(p1["timezone"] - p2["timezone"]),
                 "Rank Diff": abs(rank_to_int(p1["rank"]) - rank_to_int(p2["rank"])),
                 "Prev Games": prev_plays(p1["name"], p2["name"], hist),
-                "Penalty":  int(p),
+                "Penalty":   int(pen),
             })
         return pairs, total
 
     if n % 2 == 0:
-        matches, _ = _solve_with_bye(players)
+        matches, _ = _solve_with_pool(players)
         return matches, None
-    else:
-        # Try each player as the bye; keep the assignment with lowest total penalty
-        best_matches, best_total, best_bye = [], float("inf"), None
-        for bye_idx in range(n):
-            pool    = [p for i, p in enumerate(players) if i != bye_idx]
-            pairs, total = _solve_with_bye(pool)
-            if total < best_total:
-                best_total   = total
-                best_matches = pairs
-                best_bye     = players[bye_idx]["name"]
-        return best_matches, best_bye
 
+    # Odd: try every player as bye, keep lowest-total assignment
+    best_matches, best_total, best_bye = [], float("inf"), None
+    for bye_idx in range(n):
+        pool           = [p for i, p in enumerate(players) if i != bye_idx]
+        pairs, total   = _solve_with_pool(pool)
+        if total < best_total:
+            best_total, best_matches, best_bye = total, pairs, players[bye_idx]["name"]
 
+    return best_matches
 
 def best_matchups(users: pd.DataFrame, hist: pd.DataFrame) -> list:
     print(users)
