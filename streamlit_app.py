@@ -600,7 +600,7 @@ users   = st.session_state.users
 history = st.session_state.history
 active  = users[users.status == "active"]
 
-st.markdown("<h1>MATCHFORGE</h1>", unsafe_allow_html=True)
+st.markdown("<h1>Go Match Kango9</h1>", unsafe_allow_html=True)
 st.markdown("<div class='hero-sub'>Weekly Go League · Sunday Pairings at 12:00 UTC</div>",
             unsafe_allow_html=True)
 
