@@ -411,7 +411,7 @@ if "scheduled_weeks" not in st.session_state:
     else:
         st.session_state.scheduled_weeks = set()
 
-print(dict(st.session_state))
+
 # ═══════════════════════════════════════════════════════════════════════════════
 # CONVENIENCE REFERENCES
 # ═══════════════════════════════════════════════════════════════════════════════
@@ -610,7 +610,8 @@ tab0,tab1,tab2,tab3,tab4 = st.tabs([
     "📅 Weekly Results","🏆 Next Matchups","📊 Penalty Matrix","🔢 All Combinations","👥 Players"
 ])
 
-st.write(st.secrets)
+
+st.write(dict(st.session_state))
 # ═══ TAB 0 — Weekly Results ═══════════════════════════════════════════════════
 with tab0:
     st.markdown("## Weekly Results")
