@@ -319,6 +319,81 @@ def all_combos(users: pd.DataFrame, hist: pd.DataFrame) -> pd.DataFrame:
         })
     return pd.DataFrame(rows).sort_values("Penalty").reset_index(drop=True)
 
+
+def _build_cost_matrix(players: list[dict], hist: pd.DataFrame) -> np.ndarray:
+    """Square symmetric cost matrix for a list of player dicts."""
+    n   = len(players)
+    mat = np.zeros((n, n), dtype=float)
+    for i in range(n):
+        for j in range(n):
+            if i != j:
+                mat[i, j] = penalty(players[i], players[j], hist)
+    return mat
+
+
+def optimal_matchups(users: pd.DataFrame, hist: pd.DataFrame) -> tuple[list, int | None]:
+    """
+    Hungarian algorithm (scipy.optimize.linear_sum_assignment) for globally
+    optimal minimum-penalty matching.
+
+    For odd player counts every possible 'bye' player is tried and the
+    assignment with the lowest total penalty wins.
+
+    Returns (matches: list[dict], bye_player: str | None)
+    """
+    from scipy.optimize import linear_sum_assignment
+
+    act     = users[users.status == "active"].reset_index(drop=True)
+    players = act.to_dict("records")
+    n       = len(players)
+
+    if n < 2:
+        return [], None
+
+    def _solve_with_bye(pool: list[dict]) -> tuple[list, float]:
+        """Run Hungarian on an even-sized pool; return (matches, total_penalty)."""
+        k    = len(pool)
+        cost = _build_cost_matrix(pool, hist)
+        # Make symmetric self-pairs impossible
+        np.fill_diagonal(cost, 1e9)
+        row_ind, col_ind = linear_sum_assignment(cost)
+
+        seen, pairs = set(), []
+        total = 0.0
+        for r, c in zip(row_ind, col_ind):
+            if r in seen or c in seen or r == c:
+                continue
+            seen.add(r); seen.add(c)
+            p = cost[r, c]
+            total += p
+            p1, p2 = pool[r], pool[c]
+            pairs.append({
+                "Player 1": p1["name"], "Rank 1": p1["rank"],
+                "Player 2": p2["name"], "Rank 2": p2["rank"],
+                "TZ Diff":  abs(p1["timezone"] - p2["timezone"]),
+                "Rank Diff": abs(rank_to_int(p1["rank"]) - rank_to_int(p2["rank"])),
+                "Prev Games": prev_plays(p1["name"], p2["name"], hist),
+                "Penalty":  int(p),
+            })
+        return pairs, total
+
+    if n % 2 == 0:
+        matches, _ = _solve_with_bye(players)
+        return matches, None
+    else:
+        # Try each player as the bye; keep the assignment with lowest total penalty
+        best_matches, best_total, best_bye = [], float("inf"), None
+        for bye_idx in range(n):
+            pool    = [p for i, p in enumerate(players) if i != bye_idx]
+            pairs, total = _solve_with_bye(pool)
+            if total < best_total:
+                best_total   = total
+                best_matches = pairs
+                best_bye     = players[bye_idx]["name"]
+        return best_matches, best_bye
+
+
+
 def best_matchups(users: pd.DataFrame, hist: pd.DataFrame) -> list:
     print(users)
     print(hist)
@@ -488,7 +563,7 @@ with st.sidebar:
             push_players()
 
             # 2. Generate matches
-            matches = best_matchups(st.session_state.users, st.session_state.history)
+            matches = optimal_matchups(st.session_state.users, st.session_state.history)
             if matches:
                 new_rows = pd.DataFrame([{
                     "player1":  m["Player 1"],
