@@ -2,7 +2,7 @@
 MatchForge — Go League Matchmaking
 ====================================
 Google Sheets layout expected:
-  Sheet 1 "Players":  name | timezone | rank | status | last_active
+  Sheet 1 "Players":  name | timezone | rank | status 
   Sheet 2 "Games":    player1 | player2 | winner | url | week_date | week | year
 
 Configure via .streamlit/secrets.toml:
@@ -113,7 +113,7 @@ def rank_display(r: str) -> str:
 PLAYERS_SHEET = "Players"
 GAMES_SHEET   = "Games"
 
-PLAYERS_COLS = ["name", "timezone", "rank", "status", "last_active"]
+PLAYERS_COLS = ["name", "timezone", "rank", "status"]
 GAMES_COLS   = ["player1", "player2", "winner", "url", "week_date", "week", "year"]
 
 
@@ -161,7 +161,7 @@ def gs_load_players(client) -> tuple[pd.DataFrame | None, str | None]:
         df = pd.DataFrame(data)
         # Coerce types
         df["timezone"] = pd.to_numeric(df["timezone"], errors="coerce").fillna(0).astype(int)
-        for col in ["name", "rank", "status", "last_active"]:
+        for col in ["name", "rank", "status"]:
             if col not in df.columns: df[col] = ""
         return df[PLAYERS_COLS], None
     except Exception as e:
@@ -329,17 +329,28 @@ def best_matchups(users: pd.DataFrame, hist: pd.DataFrame) -> list:
             used.add(r["Player 1"]); used.add(r["Player 2"])
     return matches
 
-def apply_inactivity(users: pd.DataFrame, hist: pd.DataFrame) -> pd.DataFrame:
-    users   = users.copy()
-    cutoff  = iso(now_utc() - timedelta(days=7))
+def apply_inactivity(users, hist):
+    users = users.copy()
+    cutoff = iso(now_utc() - timedelta(days=7))
+    
     if hist.empty:
-        recent = set()
-    else:
-        rec    = hist[hist.week_date >= cutoff]
-        recent = set(rec.player1) | set(rec.player2)
-    users["status"] = users.apply(
-        lambda r: "inactive" if r["name"] not in recent else r["status"], axis=1
-    )
+        # No history at all → nobody gets penalized, everyone stays as-is
+        return users
+    
+    # Players who have ever played
+    ever_played = set(hist.player1) | set(hist.player2)
+    # Players who played recently (last 7 days)
+    recent = hist[hist.week_date >= cutoff]
+    recent_players = set(recent.player1) | set(recent.player2)
+    
+    def update(row):
+        if row["name"] not in ever_played:
+            return row["status"]          # never played → keep current status (active by default)
+        if row["name"] not in recent_players:
+            return "inactive"             # played before but not recently → inactive
+        return row["status"]              # played recently → unchanged
+    
+    users["status"] = users.apply(update, axis=1)
     return users
 
 def pcc(p: int) -> str:
@@ -354,23 +365,14 @@ _ls = _n - timedelta(days=(_n.weekday()+1)%7)
 _ps = _ls - timedelta(days=7)
 
 DEFAULT_USERS = pd.DataFrame([
-    {"name":"Alice",   "timezone": 0, "rank":"5k",  "status":"active",   "last_active":iso(_ls)},
-    {"name":"Bob",     "timezone": 3, "rank":"3k",  "status":"active",   "last_active":iso(_ls)},
-    {"name":"Carlos",  "timezone": 8, "rank":"1d",  "status":"active",   "last_active":iso(_ls)},
-    {"name":"Diana",   "timezone":-5, "rank":"10k", "status":"active",   "last_active":iso(_ls)},
-    {"name":"Ethan",   "timezone":10, "rank":"2d",  "status":"inactive", "last_active":iso(_ps-timedelta(14))},
-    {"name":"Fatima",  "timezone": 5, "rank":"1k",  "status":"active",   "last_active":iso(_ls)},
-    {"name":"Guo",     "timezone":12, "rank":"3d",  "status":"active",   "last_active":iso(_ls)},
-    {"name":"Hannah",  "timezone":-8, "rank":"7k",  "status":"active",   "last_active":iso(_ls)},
+    {"name":"Alice",   "timezone": 0, "rank":"5k",  "status":"active"   },
+    {"name":"Bob",     "timezone": 3, "rank":"3k",  "status":"active"},
+    {"name":"Carlos",  "timezone": 8, "rank":"1d",  "status":"active"}
 ])
 
 DEFAULT_GAMES = pd.DataFrame([
     {"player1":"Alice","player2":"Bob",   "winner":"Alice","url":"https://online-go.com/game/1001","week_date":iso(_ps),"week":week_num(_ps),"year":_ps.year},
-    {"player1":"Carlos","player2":"Diana","winner":"Carlos","url":"https://online-go.com/game/1002","week_date":iso(_ps),"week":week_num(_ps),"year":_ps.year},
-    {"player1":"Fatima","player2":"Guo",  "winner":"",     "url":"",                               "week_date":iso(_ps),"week":week_num(_ps),"year":_ps.year},
-    {"player1":"Alice","player2":"Carlos","winner":"Carlos","url":"https://online-go.com/game/1003","week_date":iso(_ls),"week":week_num(_ls),"year":_ls.year},
-    {"player1":"Bob",  "player2":"Fatima","winner":"Bob",  "url":"https://online-go.com/game/1004","week_date":iso(_ls),"week":week_num(_ls),"year":_ls.year},
-    {"player1":"Guo",  "player2":"Hannah","winner":"",     "url":"",                               "week_date":iso(_ls),"week":week_num(_ls),"year":_ls.year},
+    {"player1":"Carlos","player2":"Alice","winner":"Alice","url":"https://online-go.com/game/1002","week_date":iso(_ps),"week":week_num(_ps),"year":_ps.year}
 ])
 
 
@@ -535,7 +537,7 @@ with st.sidebar:
             today = iso(now_utc())
             new_p = pd.DataFrame([{
                 "name": name_in.strip(), "timezone": tz_in,
-                "rank": rank_in, "status": "active", "last_active": today,
+                "rank": rank_in, "status": "active",
             }])
             st.session_state.users = pd.concat(
                 [st.session_state.users, new_p], ignore_index=True
@@ -569,7 +571,7 @@ with st.sidebar:
                     st.session_state.history.at[sel_idx, "winner"] = winner_in
                     for pn in [sel_row.player1, sel_row.player2]:
                         mask = st.session_state.users["name"] == pn
-                        st.session_state.users.loc[mask, "last_active"] = sel_row.week_date
+                       # st.session_state.users.loc[mask, "last_active"] = sel_row.week_date
                     push_players()
                 if url_in:
                     st.session_state.history.at[sel_idx, "url"] = url_in
