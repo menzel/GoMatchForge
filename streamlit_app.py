@@ -468,6 +468,7 @@ with st.sidebar:
         <span style='color:var(--text)'>{h}h {m}m away</span>
     </div>""", unsafe_allow_html=True)
 
+    t.write(st.info)
     # ── Run pairing
     if st.button("▶ RUN PAIRING NOW"):
         sun    = current_sunday()
@@ -620,8 +621,6 @@ tab0,tab2,tab3,tab4 = st.tabs([
 ])
 
 
-#main print here
-#st.write(dict(st.session_state))
 # ═══ TAB 0 — Weekly Results ═══════════════════════════════════════════════════
 with tab0:
     st.markdown("## Weekly Results")
@@ -771,13 +770,6 @@ with tab4:
         </div>""", unsafe_allow_html=True)
 
     st.markdown("---")
-    st.markdown("### Penalty Formula")
-    st.markdown("""<div style='background:var(--surface2);border:1px solid var(--border);
-        border-radius:6px;padding:1.2rem 1.5rem;font-family:DM Mono,monospace;font-size:.85rem;line-height:2;'>
-        <div><span style='color:var(--accent)'>penalty</span> = tz_penalty + rank_diff + prev_games</div>
-        <div style='color:var(--muted);margin-top:.5rem;'>tz_penalty = 0 &nbsp; if |tz_diff| ≤ 4 h</div>
-        <div style='color:var(--muted);'>tz_penalty = 1 &nbsp; if 4 h &lt; |tz_diff| ≤ 10 h</div>
-        <div style='color:var(--muted);'>tz_penalty = 2 &nbsp; if |tz_diff| &gt; 10 h</div>
-        <div style='color:var(--muted);'>rank_diff  = |numeric_rank₁ − numeric_rank₂|</div>
-        <div style='color:var(--muted);'>prev_games = total historical encounters between the pair</div>
-    </div>""", unsafe_allow_html=True)
+
+    #main print here
+    st.write(dict(st.session_state))
