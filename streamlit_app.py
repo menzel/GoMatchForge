@@ -545,7 +545,7 @@ with st.sidebar:
         sel_row  = hist.loc[sel_idx]
 
         with st.form("log_result", clear_on_submit=True):
-            winner_in = st.selectbox("Winner", [sel_row.player1, sel_row.player2, "(pending)"])
+            winner_in = st.selectbox("Winner", [sel_row.player1, sel_row.player2])
             url_in    = st.text_input("Game URL", value=sel_row.url)
             r_sub     = st.form_submit_button("SAVE RESULT")
             if r_sub:
@@ -652,7 +652,7 @@ with tab0:
                 {wlabel} &nbsp;
                 <span style='font-family:DM Sans,sans-serif;font-size:.85rem;
                     color:{prog_col};font-weight:400;'>
-                    W{wk} · {yr} · {n_done}/{n_total} completed
+                    W{wk+1} · {yr} · {n_done}/{n_total} completed
                 </span>
             </div>""", unsafe_allow_html=True)
 
