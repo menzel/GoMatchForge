@@ -99,7 +99,7 @@ DAN_RANKS = [f"{d}d" for d in range(1, 10)]
 ALL_RANKS = KYU_RANKS + DAN_RANKS  # 30k(idx0,val1) … 9d(idx38,val39)
 
 def rank_to_int(r: str) -> int:
-    try:    return ALL_RANKS.index(str(r)) + 1
+    try:    return min(18,ALL_RANKS.index(str(r)) + 1)
     except: return 1
 
 def rank_display(r: str) -> str:
@@ -526,27 +526,7 @@ with st.sidebar:
 
     st.markdown("---")
 
-    # ── Add Player
-    st.markdown("### Add Player")
-    with st.form("add_player", clear_on_submit=True):
-        name_in = st.text_input("Name")
-        tz_in   = st.number_input("Timezone (UTC offset)", min_value=-12, max_value=14, value=0)
-        rank_in = st.selectbox("Go Rank", ALL_RANKS, index=ALL_RANKS.index("5k"))
-        ap_sub  = st.form_submit_button("ADD PLAYER")
-        if ap_sub and name_in.strip():
-            today = iso(now_utc())
-            new_p = pd.DataFrame([{
-                "name": name_in.strip(), "timezone": tz_in,
-                "rank": rank_in, "status": "active",
-            }])
-            st.session_state.users = pd.concat(
-                [st.session_state.users, new_p], ignore_index=True
-            )
-            push_players()
-            st.success(f"Added {name_in.strip()} ({rank_in})!")
-            st.rerun()
 
-    st.markdown("---")
 
     # ── Log game result
     st.markdown("### Log Game Result")
@@ -559,10 +539,12 @@ with st.sidebar:
             f"{r.player1} vs {r.player2} (W{int(r.week)}/{int(r.year)})"
             for _, r in pending_df.iterrows()
         ]
+      # Outside the form — reacts immediately when game changes
+        game_sel = st.selectbox("Pending game", game_labels, key="pending_game_sel")
+        sel_idx  = pending_idx[game_labels.index(game_sel)]
+        sel_row  = hist.loc[sel_idx]
+
         with st.form("log_result", clear_on_submit=True):
-            game_sel  = st.selectbox("Pending game", game_labels)
-            sel_idx   = pending_idx[game_labels.index(game_sel)]
-            sel_row   = hist.loc[sel_idx]
             winner_in = st.selectbox("Winner", [sel_row.player1, sel_row.player2, "(pending)"])
             url_in    = st.text_input("Game URL", value=sel_row.url)
             r_sub     = st.form_submit_button("SAVE RESULT")
@@ -582,10 +564,33 @@ with st.sidebar:
         st.info("No pending games.")
 
     st.markdown("---")
-    if st.button("RESET TO DEFAULTS"):
-        for k in ["users","history","scheduled_weeks","gs_loaded"]:
-            if k in st.session_state: del st.session_state[k]
-        st.rerun()
+  
+      # ── Add Player
+    st.markdown("### Add Player")
+    with st.form("add_player", clear_on_submit=True):
+        name_in = st.text_input("Name")
+        tz_in   = st.number_input("Timezone (UTC offset)", min_value=-12, max_value=14, value=0)
+        rank_in = st.selectbox("Go Rank", ALL_RANKS, index=ALL_RANKS.index("5k"))
+        ap_sub  = st.form_submit_button("ADD PLAYER")
+        if ap_sub and name_in.strip():
+            today = iso(now_utc())
+            new_p = pd.DataFrame([{
+                "name": name_in.strip(), "timezone": tz_in,
+                "rank": rank_in, "status": "active",
+            }])
+            st.session_state.users = pd.concat(
+                [st.session_state.users, new_p], ignore_index=True
+            )
+            push_players()
+            st.success(f"Added {name_in.strip()} ({rank_in})!")
+            st.rerun()
+
+
+    #st.markdown("---")
+    #if st.button("RESET TO DEFAULTS"):
+    ##    for k in ["users","history","scheduled_weeks","gs_loaded"]:
+    #        if k in st.session_state: del st.session_state[k]
+    #    st.rerun()
 
 
 # ═══════════════════════════════════════════════════════════════════════════════
@@ -615,7 +620,8 @@ tab0,tab1,tab2,tab3,tab4 = st.tabs([
 ])
 
 
-st.write(dict(st.session_state))
+#main print here
+#st.write(dict(st.session_state))
 # ═══ TAB 0 — Weekly Results ═══════════════════════════════════════════════════
 with tab0:
     st.markdown("## Weekly Results")
