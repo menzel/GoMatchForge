@@ -411,7 +411,7 @@ if "scheduled_weeks" not in st.session_state:
     else:
         st.session_state.scheduled_weeks = set()
 
-pprint(dict(st.session_state))
+print(dict(st.session_state))
 # ═══════════════════════════════════════════════════════════════════════════════
 # CONVENIENCE REFERENCES
 # ═══════════════════════════════════════════════════════════════════════════════
