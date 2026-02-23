@@ -476,9 +476,10 @@ with st.sidebar:
         wnum   = week_num(sun)
         wyear  = sun.year
 
-        if wk in st.session_state.scheduled_weeks:
-            st.info(f"Already scheduled for {wk}.")
-        else:
+        #if wk in st.session_state.scheduled_weeks:
+        #    st.info(f"Already scheduled for {wk}.")
+        #else:
+       if True:
             # 1. Inactivity pass
             st.session_state.users = apply_inactivity(
                 st.session_state.users, st.session_state.history
