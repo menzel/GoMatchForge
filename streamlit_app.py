@@ -585,7 +585,7 @@ with st.sidebar:
         with st.form("log_result", clear_on_submit=True):
             winner_in = st.selectbox("Winner", [sel_row.player1, sel_row.player2])
             url_in    = st.text_input("Game URL", value=sel_row.url)
-            r_sub     = st.form_submit_button("SAVE RESULT")
+            r_sub     = st.form_submit_button("SAVE RESULT",type="primary")
             if r_sub:
                 if winner_in != "(pending)":
                     st.session_state.history.at[sel_idx, "winner"] = winner_in
@@ -628,9 +628,9 @@ with st.sidebar:
     # ADMIN PANEL
     #with st.form("pairing", clear_on_submit=True):
     
-    pw = st.text_input("Password")
+    pw = st.text_input("Password", type="password")
     
-    if st.button("▶ RUN PAIRING NOW"):
+    if st.button("▶ RUN PAIRING NOW", type='tertiary'):
         sun    = current_sunday()
         wk     = iso(sun)
         wnum   = week_num(sun)
@@ -672,7 +672,7 @@ with st.sidebar:
 
     # ── Reload from Sheets
     if st.session_state.gs_connected:
-        if st.button("🔄 RELOAD FROM SHEETS"):
+        if st.button("🔄 RELOAD SHEETS", type='tertiary') and pw == "password":
             players_df, p_err = gs_load_players(st.session_state.gs_client)
             games_df,   g_err = gs_load_games(st.session_state.gs_client)
             if not p_err and not g_err:
@@ -685,7 +685,9 @@ with st.sidebar:
             else:
                 st.error(f"Reload failed: {p_err or g_err}")
             st.rerun()
-
+    else:
+      time.sleep(1)
+      st.write("Wrong password")
     st.markdown("---")
 
     #st.markdown("---")
@@ -727,7 +729,7 @@ with tab0:
     st.markdown("## Weekly Results")
 
     if history.empty:
-        st.info("No games yet. Use **▶ RUN PAIRING NOW** in the sidebar.")
+        st.info("No games yet.")
     else:
         # Group by (year, week) descending
         groups = (
