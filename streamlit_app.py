@@ -602,35 +602,42 @@ with st.sidebar:
     st.markdown("---")
   
       # ── Add Player
-    st.markdown("### Add Player")
-    with st.form("add_player", clear_on_submit=True):
-        name_in = st.text_input("Name")
-        tz_in   = st.number_input("Timezone (UTC offset)", min_value=-12, max_value=14, value=0)
-        rank_in = st.selectbox("Go Rank", ALL_RANKS, index=ALL_RANKS.index("5k"))
-        ap_sub  = st.form_submit_button("ADD PLAYER")
-        if ap_sub and name_in.strip():
-            today = iso(now_utc())
-            new_p = pd.DataFrame([{
-                "name": name_in.strip(), "timezone": tz_in,
-                "rank": rank_in, "status": "active",
-            }])
-            st.session_state.users = pd.concat(
-                [st.session_state.users, new_p], ignore_index=True
-            )
-            push_players()
-            st.success(f"Added {name_in.strip()} ({rank_in})!")
-            st.rerun()
+    #st.markdown("### Add Player")
+    #with st.form("add_player", clear_on_submit=True):
+    #    name_in = st.text_input("Name")
+    #    tz_in   = st.number_input("Timezone (UTC offset)", min_value=-12, max_value=14, value=0)
+    #    rank_in = st.selectbox("Go Rank", ALL_RANKS, index=ALL_RANKS.index("5k"))
+    #    ap_sub  = st.form_submit_button("ADD PLAYER")
+    #    if ap_sub and name_in.strip():
+    #        today = iso(now_utc())
+    #        new_p = pd.DataFrame([{
+    #            "name": name_in.strip(), "timezone": tz_in,
+    #            "rank": rank_in, "status": "active",
+    #        }])
+    #        st.session_state.users = pd.concat(
+    #            [st.session_state.users, new_p], ignore_index=True
+    #        )
+    #        push_players()
+    #        st.success(f"Added {name_in.strip()} ({rank_in})!")
+    #        st.rerun()
 
 
     # ── Run pairing
     # ADMIN PANEL
+    #with st.form("pairing", clear_on_submit=True):
+    
+    pw = st.text_input("Password")
+    
     if st.button("▶ RUN PAIRING NOW"):
         sun    = current_sunday()
         wk     = iso(sun)
         wnum   = week_num(sun)
         wyear  = sun.year
 
-        pw = st.text_input("Password")
+        if pw != "password":
+          time.sleep(1)
+          return "Wrong password"
+        
 
         #if wk in st.session_state.scheduled_weeks:
         #    st.info(f"Already scheduled for {wk}.")
