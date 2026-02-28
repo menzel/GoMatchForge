@@ -551,74 +551,16 @@ with st.sidebar:
     st.markdown("---")
 
     # Countdown
-    ns  = next_sunday_noon()
-    dlt = ns - now_utc()
-    h,rem = divmod(int(dlt.total_seconds()),3600); m=rem//60
-    st.markdown(f"""<div class='info-box'>
-        ⏱ Next auto-pairing<br>
-        <span style='color:var(--accent);font-size:.95rem;'>{ns.strftime("%A %d %b, %H:%M")} UTC</span><br>
-        <span style='color:var(--text)'>{h}h {m}m away</span>
-    </div>""", unsafe_allow_html=True)
+    #ns  = next_sunday_noon()
+    #dlt = ns - now_utc()
+    #h,rem = divmod(int(dlt.total_seconds()),3600); m=rem//60
+    #st.markdown(f"""<div class='info-box'>
+    #    ⏱ Next auto-pairing<br>
+    #    <span style='color:var(--accent);font-size:.95rem;'>{ns.strftime("%A %d %b, %H:%M")} UTC</span><br>
+    #    <span style='color:var(--text)'>{h}h {m}m away</span>
+    #</div>""", unsafe_allow_html=True)
 
 
-    # ── Run pairing
-    if st.button("▶ RUN PAIRING NOW"):
-        sun    = current_sunday()
-        wk     = iso(sun)
-        wnum   = week_num(sun)
-        wyear  = sun.year
-
-        #if wk in st.session_state.scheduled_weeks:
-        #    st.info(f"Already scheduled for {wk}.")
-        #else:
-        if True:
-            # 1. Inactivity pass
-            st.session_state.users = apply_inactivity(
-                st.session_state.users, st.session_state.history
-            )
-            push_players()
-
-            # 2. Generate matches
-            matches, bye = optimal_matchups(st.session_state.users, st.session_state.history)
-            if matches:
-                new_rows = pd.DataFrame([{
-                    "player1":  m["Player 1"],
-                    "player2":  m["Player 2"],
-                    "winner":   "",
-                    "url":      "",
-                    "week_date": wk,
-                    "week":     wnum,
-                    "year":     wyear,
-                } for m in matches])
-                st.session_state.history = pd.concat(
-                    [st.session_state.history, new_rows], ignore_index=True
-                )
-                st.session_state.scheduled_weeks.add(wk)
-                append_games_to_sheet(new_rows)
-                st.success(f"Scheduled {len(matches)} matches for week {wnum}/{wyear}!")
-            else:
-                st.warning("No active players to pair.")
-        st.rerun()
-
-    st.markdown("---")
-
-    # ── Reload from Sheets
-    if st.session_state.gs_connected:
-        if st.button("🔄 RELOAD FROM SHEETS"):
-            players_df, p_err = gs_load_players(st.session_state.gs_client)
-            games_df,   g_err = gs_load_games(st.session_state.gs_client)
-            if not p_err and not g_err:
-                st.session_state.users   = players_df
-                st.session_state.history = games_df
-                if not games_df.empty:
-                    st.session_state.scheduled_weeks = set(games_df["week_date"].unique().tolist())
-                st.session_state.gs_load_status = "ok"
-                st.success("Reloaded from Google Sheets!")
-            else:
-                st.error(f"Reload failed: {p_err or g_err}")
-            st.rerun()
-
-    st.markdown("---")
 
 
 
@@ -679,6 +621,68 @@ with st.sidebar:
             st.success(f"Added {name_in.strip()} ({rank_in})!")
             st.rerun()
 
+
+    # ── Run pairing
+    # ADMIN PANEL
+    if st.button("▶ RUN PAIRING NOW"):
+        sun    = current_sunday()
+        wk     = iso(sun)
+        wnum   = week_num(sun)
+        wyear  = sun.year
+
+        pw = st.text_input("Password")
+
+        #if wk in st.session_state.scheduled_weeks:
+        #    st.info(f"Already scheduled for {wk}.")
+        #else:
+        if True:
+            # 1. Inactivity pass
+            st.session_state.users = apply_inactivity(
+                st.session_state.users, st.session_state.history
+            )
+            push_players()
+
+            # 2. Generate matches
+            matches, bye = optimal_matchups(st.session_state.users, st.session_state.history)
+            if matches:
+                new_rows = pd.DataFrame([{
+                    "player1":  m["Player 1"],
+                    "player2":  m["Player 2"],
+                    "winner":   "",
+                    "url":      "",
+                    "week_date": wk,
+                    "week":     wnum,
+                    "year":     wyear,
+                } for m in matches])
+                st.session_state.history = pd.concat(
+                    [st.session_state.history, new_rows], ignore_index=True
+                )
+                st.session_state.scheduled_weeks.add(wk)
+                append_games_to_sheet(new_rows)
+                st.success(f"Scheduled {len(matches)} matches for week {wnum}/{wyear}!")
+            else:
+                st.warning("No active players to pair.")
+        st.rerun()
+
+    st.markdown("---")
+
+    # ── Reload from Sheets
+    if st.session_state.gs_connected:
+        if st.button("🔄 RELOAD FROM SHEETS"):
+            players_df, p_err = gs_load_players(st.session_state.gs_client)
+            games_df,   g_err = gs_load_games(st.session_state.gs_client)
+            if not p_err and not g_err:
+                st.session_state.users   = players_df
+                st.session_state.history = games_df
+                if not games_df.empty:
+                    st.session_state.scheduled_weeks = set(games_df["week_date"].unique().tolist())
+                st.session_state.gs_load_status = "ok"
+                st.success("Reloaded from Google Sheets!")
+            else:
+                st.error(f"Reload failed: {p_err or g_err}")
+            st.rerun()
+
+    st.markdown("---")
 
     #st.markdown("---")
     #if st.button("RESET TO DEFAULTS"):
@@ -784,7 +788,6 @@ with tab0:
                         <div>{url_html}</div>
                         <div>{winner_html}</div>
                     </div>
-                    <div class='match-meta'>{url_html}</div>
                 </div>
                 """, unsafe_allow_html=True)
 
