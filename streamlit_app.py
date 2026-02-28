@@ -101,8 +101,6 @@ DAN_RANKS = [f"{d}d" for d in range(1, 10)]
 ALL_RANKS = KYU_RANKS + DAN_RANKS  # 30k(idx0,val1) … 9d(idx38,val39)
 
 def won_games(player: dict,hist: dict) -> int:
-      #main print here
- 
   return (hist.winner==player['name']).size
   
 # ═══════════════════════════════════════════════════════════════════════════════
@@ -110,9 +108,7 @@ def won_games(player: dict,hist: dict) -> int:
 def rank_to_int(player: dict,hist: dict) -> int:
 
   r = player['rank']
-  r -= won_games(player,hist)//2
-  st.write(r)
-  return max(10,ALL_RANKS.index(str(r)) + 1)
+  return max(10,ALL_RANKS.index(str(r)) + 1) -  won_games(player,hist)//2
 
 def rank_display(r: str) -> str:
     css = "rank-dan" if str(r).endswith("d") else "rank-kyu"
