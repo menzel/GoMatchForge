@@ -108,13 +108,11 @@ def won_games(player: dict,hist: dict) -> int:
 # ═══════════════════════════════════════════════════════════════════════════════
 
 def rank_to_int(player: dict,hist: dict) -> int:
-    try:    
-      r = player['rank']
-      r -= won_games(player,hist)//2
-      st.write(r)
-      return max(10,ALL_RANKS.index(str(r)) + 1)
-    except: 
-      return 1
+
+  r = player['rank']
+  r -= won_games(player,hist)//2
+  st.write(r)
+  return max(10,ALL_RANKS.index(str(r)) + 1)
 
 def rank_display(r: str) -> str:
     css = "rank-dan" if str(r).endswith("d") else "rank-kyu"
