@@ -636,7 +636,7 @@ with st.sidebar:
         wnum   = week_num(sun)
         wyear  = sun.year
 
-        if pw != "password":
+        if pw != st.secrets["sheets"]["password"]:
           time.sleep(1)
           st.write("Wrong password")
         else:
@@ -672,7 +672,7 @@ with st.sidebar:
 
     # ── Reload from Sheets
     if st.session_state.gs_connected:
-        if st.button("🔄 RELOAD SHEETS", type='tertiary') and pw == "password":
+        if st.button("🔄 RELOAD SHEETS", type='tertiary') and pw == st.secrets["sheets"]["password"]:
             players_df, p_err = gs_load_players(st.session_state.gs_client)
             games_df,   g_err = gs_load_games(st.session_state.gs_client)
             if not p_err and not g_err:
