@@ -296,7 +296,7 @@ def prev_plays(p1: str, p2: str, hist: pd.DataFrame) -> int:
 
 def penalty(p1d: dict, p2d: dict, hist: pd.DataFrame) -> int:
     tz = abs(p1d["timezone"] - p2d["timezone"])
-    tz = tz*p1d['timezone_matters']*p2d['timezone_matters']*
+    tz = tz*p1d['timezone_matters']*p2d['timezone_matters']
     tp = 8 if tz>10 else (3 if tz>4 else 0)
     rp = abs(rank_to_int(p1d,hist) - rank_to_int(p2d,hist))
     rp = rp*2 if tz>=5 else rp
@@ -781,6 +781,7 @@ with tab0:
                             <span class='match-player {p2_cls}'>{p2}</span>
                             <span style='margin:0 .4rem'>{rank_display(r2)}</span>
                         </div>
+                        <div>{url_html}</div>
                         <div>{winner_html}</div>
                     </div>
                     <div class='match-meta'>{url_html}</div>
