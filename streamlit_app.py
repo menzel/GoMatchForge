@@ -636,13 +636,8 @@ with st.sidebar:
 
         if pw != "password":
           time.sleep(1)
-          return "Wrong password"
-        
-
-        #if wk in st.session_state.scheduled_weeks:
-        #    st.info(f"Already scheduled for {wk}.")
-        #else:
-        if True:
+          st.write("Wrong password")
+        else:
             # 1. Inactivity pass
             st.session_state.users = apply_inactivity(
                 st.session_state.users, st.session_state.history
