@@ -98,9 +98,18 @@ KYU_RANKS = [f"{k}k" for k in range(30, 0, -1)]
 DAN_RANKS = [f"{d}d" for d in range(1, 10)]
 ALL_RANKS = KYU_RANKS + DAN_RANKS  # 30k(idx0,val1) … 9d(idx38,val39)
 
-def rank_to_int(r: str) -> int:
-    try:    return max(10,ALL_RANKS.index(str(r)) + 1)
-    except: return 1
+def won_games(player: dict,hist: dict) -> int:
+  return (hist.winner==player['name']).length()
+  
+# ═══════════════════════════════════════════════════════════════════════════════
+
+def rank_to_int(player: dict,hist: dict) -> int:
+    try:    
+      r = player['rank']
+      r -= won_games(player,hist)//2
+      return max(10,ALL_RANKS.index(str(r)) + 1)
+    except: 
+      return 1
 
 def rank_display(r: str) -> str:
     css = "rank-dan" if str(r).endswith("d") else "rank-kyu"
@@ -287,8 +296,9 @@ def prev_plays(p1: str, p2: str, hist: pd.DataFrame) -> int:
 
 def penalty(p1d: dict, p2d: dict, hist: pd.DataFrame) -> int:
     tz = abs(p1d["timezone"] - p2d["timezone"])
+    tz = tz*p1d['timezone_matters']*p2d['timezone_matters']*
     tp = 8 if tz>10 else (3 if tz>4 else 0)
-    rp = abs(rank_to_int(p1d["rank"]) - rank_to_int(p2d["rank"]))
+    rp = abs(rank_to_int(p1d,hist) - rank_to_int(p2d,hist))
     rp = rp*2 if tz>=5 else rp
     hp = prev_plays(p1d["name"], p2d["name"], hist)
     return tp + rp + 4*hp
@@ -313,7 +323,7 @@ def all_combos(users: pd.DataFrame, hist: pd.DataFrame) -> pd.DataFrame:
             "Player 1":p1["name"],"Rank 1":p1["rank"],
             "Player 2":p2["name"],"Rank 2":p2["rank"],
             "TZ Diff":abs(p1["timezone"]-p2["timezone"]),
-            "Rank Diff":abs(rank_to_int(p1["rank"])-rank_to_int(p2["rank"])),
+            "Rank Diff":abs(rank_to_int(p1,hist)-rank_to_int(p2,hist)),
             "Prev Games":prev_plays(p1["name"],p2["name"],hist),
             "Penalty":pen,
         })
