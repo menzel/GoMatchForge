@@ -390,7 +390,7 @@ def optimal_matchups(users: pd.DataFrame, hist: pd.DataFrame) -> tuple[list, str
                 "Player 1":  p1["name"],  "Rank 1": p1["rank"],
                 "Player 2":  p2["name"],  "Rank 2": p2["rank"],
                 "TZ Diff":   abs(p1["timezone"] - p2["timezone"]),
-                "Rank Diff": abs(rank_to_int(p1["rank"]) - rank_to_int(p2["rank"])),
+                "Rank Diff": abs(rank_to_int(p1,hist) - rank_to_int(p2,hist)),
                 "Prev Games": prev_plays(p1["name"], p2["name"], hist),
                 "Penalty":   int(pen),
             })
