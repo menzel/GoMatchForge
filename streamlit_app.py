@@ -103,7 +103,7 @@ ALL_RANKS = KYU_RANKS + DAN_RANKS  # 30k(idx0,val1) … 9d(idx38,val39)
 def won_games(player: dict,hist: dict) -> int:
       #main print here
  
-  return (hist.winner==player['name']).length()
+  return (hist.winner==player['name']).size
   
 # ═══════════════════════════════════════════════════════════════════════════════
 
