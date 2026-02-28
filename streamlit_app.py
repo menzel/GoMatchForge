@@ -101,6 +101,8 @@ DAN_RANKS = [f"{d}d" for d in range(1, 10)]
 ALL_RANKS = KYU_RANKS + DAN_RANKS  # 30k(idx0,val1) … 9d(idx38,val39)
 
 def won_games(player: dict,hist: dict) -> int:
+      #main print here
+ 
   return (hist.winner==player['name']).length()
   
 # ═══════════════════════════════════════════════════════════════════════════════
@@ -109,6 +111,7 @@ def rank_to_int(player: dict,hist: dict) -> int:
     try:    
       r = player['rank']
       r -= won_games(player,hist)//2
+      st.write(r)
       return max(10,ALL_RANKS.index(str(r)) + 1)
     except: 
       return 1
@@ -562,10 +565,6 @@ with st.sidebar:
     #    <span style='color:var(--text)'>{h}h {m}m away</span>
     #</div>""", unsafe_allow_html=True)
 
-
-
-
-
     # ── Log game result
     st.markdown("### Log Game Result")
     hist = st.session_state.history
@@ -705,7 +704,7 @@ history = st.session_state.history
 active  = users[users.status == "active"]
 
 st.markdown("<h1>Go Match Kango9</h1>", unsafe_allow_html=True)
-st.markdown("<div class='hero-sub'>Weekly Go League · Sunday Pairings at 12:00 UTC</div>",
+st.markdown("<div class='hero-sub'>Weekly Go League</div>",
             unsafe_allow_html=True)
 
 # KPIs
