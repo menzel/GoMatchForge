@@ -296,11 +296,14 @@ def prev_plays(p1: str, p2: str, hist: pd.DataFrame) -> int:
 def penalty(p1d: dict, p2d: dict, hist: pd.DataFrame) -> int:
     tz = abs(p1d["timezone"] - p2d["timezone"])
     tz = tz*p1d['timezone_matters']*p2d['timezone_matters']
-    tp = 8 if tz>10 else (3 if tz>4 else 0)
+    tp = 4 if tz>10 else (1.5 if tz>4 else 0)
+
     rp = abs(rank_to_int(p1d,hist) - rank_to_int(p2d,hist))
-    rp = rp*2 if tz>=5 else rp
+    rp = rp*4 if tz>=5 else rp
+
     hp = prev_plays(p1d["name"], p2d["name"], hist)
-    return tp + rp + 4*hp
+
+    return tp + rp + 2*hp
 
 def build_matrix(users: pd.DataFrame, hist: pd.DataFrame) -> pd.DataFrame:
     act   = users[users.status=="active"].reset_index(drop=True)
@@ -750,6 +753,7 @@ with tab0:
                     W{wk+1} · {yr} · {n_done}/{n_total} completed
                 </span>
             </div>""", unsafe_allow_html=True)
+            wgames = wgames.sort_values(by=['player1'].rank)
 
             for _, g in wgames.iterrows():
                 p1,p2   = g.player1, g.player2
@@ -778,9 +782,11 @@ with tab0:
                 <div class='match-card {card_cls}'>
                     <div class='match-top'>
                         <div class='match-players'>
+                            <span class=''>⚪</span>
                             <span class='match-player {p1_cls}'>{p1}</span>
                             <span style='margin:0 .4rem'>{rank_display(r1)}</span>
                             <span class='vs'>VS</span>
+                            <span class=''>⚫</span>
                             <span class='match-player {p2_cls}'>{p2}</span>
                             <span style='margin:0 .4rem'>{rank_display(r2)}</span>
                         </div>
