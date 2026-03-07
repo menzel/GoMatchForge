@@ -759,7 +759,7 @@ with tab0:
             </div>""", unsafe_allow_html=True)
 
             wgames['first_user_rank'] = wgames.apply(lambda x: ALL_RANKS.index(str(get_rank(x.player1))),axis=1) #ignore prev games for sorting 
-            wgames = wgames.sort_values(by='first_user_rank')
+            wgames = wgames.sort_values(by='first_user_rank',ascending=False)
             print(wgames)
 
             for _, g in wgames.iterrows():
