@@ -753,7 +753,7 @@ with tab0:
                     W{wk+1} · {yr} · {n_done}/{n_total} completed
                 </span>
             </div>""", unsafe_allow_html=True)
-            wgames = wgames.sort_values(by=['player1'].rank)
+            wgames = wgames.sort_values(by=['player1']['rank'])
 
             for _, g in wgames.iterrows():
                 p1,p2   = g.player1, g.player2
