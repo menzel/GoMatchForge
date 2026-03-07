@@ -757,8 +757,10 @@ with tab0:
                     W{wk+1} · {yr} · {n_done}/{n_total} completed
                 </span>
             </div>""", unsafe_allow_html=True)
-            wgames['first_user_rank'] = wgames.apply(lambda x: get_rank(x.player1),axis=1)
+
+            wgames['first_user_rank'] = wgames.apply(lambda x: ALL_RANKS.index(str(get_rank(x.player1))),axis=1) #ignore prev games for sorting 
             wgames = wgames.sort_values(by='first_user_rank')
+            print(wgames)
 
             for _, g in wgames.iterrows():
                 p1,p2   = g.player1, g.player2
