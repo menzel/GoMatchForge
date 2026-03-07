@@ -459,9 +459,9 @@ _ls = _n - timedelta(days=(_n.weekday()+1)%7)
 _ps = _ls - timedelta(days=7)
 
 DEFAULT_USERS = pd.DataFrame([
-    {"name":"Alice",   "timezone": 0, "rank":"5k",  "status":"active", "timezone_matters" 1},
-    {"name":"Bob",     "timezone": 3, "rank":"3k",  "status":"active", "timezone_matters" 1},
-    {"name":"Carlos",  "timezone": 8, "rank":"1d",  "status":"active", "timezone_matters" 0}
+    {"name":"Alice",   "timezone": 0, "rank":"5k",  "status":"active", "timezone_matters": 1},
+    {"name":"Bob",     "timezone": 3, "rank":"3k",  "status":"active", "timezone_matters": 1},
+    {"name":"Carlos",  "timezone": 8, "rank":"1d",  "status":"active", "timezone_matters": 0}
 ])
 
 DEFAULT_GAMES = pd.DataFrame([
