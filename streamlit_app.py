@@ -59,7 +59,7 @@ h3{ font-family:'DM Mono',monospace; font-size:1rem!important; color:var(--accen
 .metric-card .label{ font-family:'DM Mono',monospace; font-size:.7rem; color:var(--muted); text-transform:uppercase; letter-spacing:1.5px; }
 .metric-card .value{ font-family:'Bebas Neue',sans-serif; font-size:2.5rem; color:var(--accent); line-height:1.1; }
 .section-divider{ border:none; border-top:1px solid var(--border); margin:2rem 0; }
-.match-card{ background:var(--surface2); border:1px solid var(--border); border-radius:6px; padding:1.2rem 1.5rem; margin-bottom:.75rem; }
+.match-card{ background:var(--surface2); border:1px solid var(--border); border-radius:6px; padding:0.2rem 0.2rem; margin-bottom:.75rem; }
 .match-card.best{ border-color:var(--accent); background:rgba(232,255,71,.04); }
 .match-card.has-winner{ border-color:var(--good); }
 .match-top{ display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:.5rem; }
@@ -746,6 +746,10 @@ with tab0:
             n_total     = len(wgames)
             prog_col    = "var(--good)" if n_done==n_total else "var(--warn)"
 
+            def get_rank(pn):
+                row = users[users.name==pn]
+                return row.iloc[0]["rank"] if not row.empty else "?"
+
             st.markdown(f"""<div class='week-header'>
                 {wlabel} &nbsp;
                 <span style='font-family:DM Sans,sans-serif;font-size:.85rem;
@@ -753,16 +757,13 @@ with tab0:
                     W{wk+1} · {yr} · {n_done}/{n_total} completed
                 </span>
             </div>""", unsafe_allow_html=True)
-            wgames = wgames.sort_values(by=['player1']['rank'])
+            wgames['first_user_rank'] = wgames.apply(lambda x: get_rank(x.player1),axis=1)
+            wgames = wgames.sort_values(by='first_user_rank')
 
             for _, g in wgames.iterrows():
                 p1,p2   = g.player1, g.player2
                 winner  = g.winner
                 url     = g.url
-
-                def get_rank(pn):
-                    row = users[users.name==pn]
-                    return row.iloc[0]["rank"] if not row.empty else "?"
 
                 r1,r2    = get_rank(p1), get_rank(p2)
                 p1_cls   = "winner" if winner==p1 else ("loser" if winner else "")
