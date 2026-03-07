@@ -299,7 +299,7 @@ def penalty(p1d: dict, p2d: dict, hist: pd.DataFrame) -> int:
     tp = 4 if tz>10 else (1.5 if tz>4 else 0)
 
     rp = abs(rank_to_int(p1d,hist) - rank_to_int(p2d,hist))
-    rp = rp*4 if tz>=5 else rp
+    rp = rp*8 if tz>=5 else rp
 
     hp = prev_plays(p1d["name"], p2d["name"], hist)
 
@@ -459,9 +459,9 @@ _ls = _n - timedelta(days=(_n.weekday()+1)%7)
 _ps = _ls - timedelta(days=7)
 
 DEFAULT_USERS = pd.DataFrame([
-    {"name":"Alice",   "timezone": 0, "rank":"5k",  "status":"active"   },
-    {"name":"Bob",     "timezone": 3, "rank":"3k",  "status":"active"},
-    {"name":"Carlos",  "timezone": 8, "rank":"1d",  "status":"active"}
+    {"name":"Alice",   "timezone": 0, "rank":"5k",  "status":"active", "timezone_matters" 1},
+    {"name":"Bob",     "timezone": 3, "rank":"3k",  "status":"active", "timezone_matters" 1},
+    {"name":"Carlos",  "timezone": 8, "rank":"1d",  "status":"active", "timezone_matters" 0}
 ])
 
 DEFAULT_GAMES = pd.DataFrame([
