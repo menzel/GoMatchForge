@@ -299,7 +299,7 @@ def penalty(p1d: dict, p2d: dict, hist: pd.DataFrame) -> int:
     tp = 4 if tz>10 else (1.5 if tz>4 else 0)
 
     rp = abs(rank_to_int(p1d,hist) - rank_to_int(p2d,hist))
-    rp = rp*8 if tz>=5 else rp
+    rp = rp*8 if rp>=5 else rp
 
     hp = prev_plays(p1d["name"], p2d["name"], hist)
 
