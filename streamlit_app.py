@@ -82,7 +82,7 @@ h3{ font-family:'DM Mono',monospace; font-size:1rem!important; color:var(--accen
 .rank-dan{ font-family:'DM Mono',monospace; font-size:.75rem; padding:.15rem .5rem; border-radius:4px; background:rgba(251,191,36,.15); color:var(--dan); }
 [data-testid="stDataFrame"]{ border:1px solid var(--border); border-radius:6px; }
 [data-testid="stSidebar"]{ background:var(--surface); border-right:1px solid var(--border); }
-.stButton>button{ background:var(--accent); color:#0a0a0f; border:none; font-family:'Bebas Neue',sans-serif; font-size:1.1rem; letter-spacing:2px; padding:.6rem 2rem; border-radius:3px; transition:opacity .2s; width:100%; }
+.stButton>button{ background:#939393; color:#0a0a0f; border:none; font-family:'Bebas Neue',sans-serif; font-size:1.1rem; letter-spacing:2px; padding:.6rem 2rem; border-radius:3px; transition:opacity .2s; width:100%; }
 .stButton>button:hover{ opacity:.85; }
 .info-box{ background:var(--surface2); border:1px solid var(--border); border-left:3px solid var(--accent2); border-radius:4px; padding:.9rem 1.2rem; font-family:'DM Mono',monospace; font-size:.8rem; color:var(--muted); margin-bottom:1rem; }
 .gs-badge{ display:inline-block; font-family:'DM Mono',monospace; font-size:.7rem; padding:.2rem .6rem; border-radius:100px; margin-left:.5rem; }
@@ -623,10 +623,12 @@ with st.sidebar:
     # ── Run pairing
     # ADMIN PANEL
     #with st.form("pairing", clear_on_submit=True):
+
+    st.markdown("### Admin")
     
     pw = st.text_input("Password", type="password")
     
-    if st.button("▶ RUN PAIRING NOW", type='tertiary'):
+    if st.button("▶ RUN PAIRING", type='tertiary'):
         sun    = current_sunday()
         wk     = iso(sun)
         wnum   = week_num(sun)
@@ -663,8 +665,6 @@ with st.sidebar:
             else:
                 st.warning("No active players to pair.")
         st.rerun()
-
-    st.markdown("---")
 
     # ── Reload from Sheets
     if st.session_state.gs_connected:
