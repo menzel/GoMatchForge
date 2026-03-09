@@ -557,15 +557,11 @@ with st.sidebar:
     st.markdown("<div class='hero-sub'>Go League Manager</div>", unsafe_allow_html=True)
     st.markdown("---")
 
-    # Countdown
-    #ns  = next_sunday_noon()
-    #dlt = ns - now_utc()
-    #h,rem = divmod(int(dlt.total_seconds()),3600); m=rem//60
-    #st.markdown(f"""<div class='info-box'>
-    #    ⏱ Next auto-pairing<br>
-    #    <span style='color:var(--accent);font-size:.95rem;'>{ns.strftime("%A %d %b, %H:%M")} UTC</span><br>
-    #    <span style='color:var(--text)'>{h}h {m}m away</span>
-    #</div>""", unsafe_allow_html=True)
+    def check_key(key,players):
+        print(key)
+        print(players)
+        print(users)
+        return False
 
     # ── Log game result
     st.markdown("### Log Game Result")
@@ -729,13 +725,6 @@ tab0,tab4,tab2,tab3= st.tabs([
     "🏆 Weekly Results","👥 Players","📊 Penalty Matrix","🔢 All Combinations"
 ])
 
-
-def check_key(key,players):
-    print(key)
-    print(players)
-    print(users)
-    return False
-    
 
 
 # ═══ TAB 0 — Weekly Results ═══════════════════════════════════════════════════
