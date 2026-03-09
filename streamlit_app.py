@@ -589,7 +589,7 @@ with st.sidebar:
             if r_sub:
 
                 if not check_key(key_in,[sel_row.player1, sel_row.player2]):
-                    st.warning("Invalid key",[sel_row.player1, sel_row.player2])
+                    st.warning("Invalid key!")
                 else:
 
                     if winner_in != "(pending)":
