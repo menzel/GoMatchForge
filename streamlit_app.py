@@ -464,9 +464,9 @@ _ls = _n - timedelta(days=(_n.weekday()+1)%7)
 _ps = _ls - timedelta(days=7)
 
 DEFAULT_USERS = pd.DataFrame([
-    {"name":"Alice",   "timezone": 0, "rank":"5k",  "status":"active", "timezone_matters": 1},
-    {"name":"Bob",     "timezone": 3, "rank":"3k",  "status":"active", "timezone_matters": 1},
-    {"name":"Carlos",  "timezone": 8, "rank":"1d",  "status":"active", "timezone_matters": 0}
+    {"name":"Alice",   "timezone": 0, "rank":"5k",  "status":"active", "timezone_matters": 1, "key": "lama"},
+    {"name":"Bob",     "timezone": 3, "rank":"3k",  "status":"active", "timezone_matters": 1, "key": "tree"},
+    {"name":"Carlos",  "timezone": 8, "rank":"1d",  "status":"active", "timezone_matters": 0, "key": "house"}
 ])
 
 DEFAULT_GAMES = pd.DataFrame([
@@ -586,6 +586,11 @@ with st.sidebar:
         with st.form("log_result", clear_on_submit=True):
             winner_in = st.selectbox("Winner", [sel_row.player1, sel_row.player2])
             url_in    = st.text_input("Game URL", value=sel_row.url)
+            key_in    = st.text_input("Player key", value=sel_row.url)
+
+            if not check_key(key_in,):
+                st.error("Invalid key",[sel_row.player1, sel_row.player2])
+
             r_sub     = st.form_submit_button("SAVE RESULT",type="primary")
             if r_sub:
                 if winner_in != "(pending)":
@@ -723,6 +728,14 @@ st.markdown("<hr class='section-divider'>", unsafe_allow_html=True)
 tab0,tab4,tab2,tab3= st.tabs([
     "🏆 Weekly Results","👥 Players","📊 Penalty Matrix","🔢 All Combinations"
 ])
+
+
+def check_key(key,players):
+    print(key)
+    print(players)
+    print(users)
+    return False
+    
 
 
 # ═══ TAB 0 — Weekly Results ═══════════════════════════════════════════════════
