@@ -720,8 +720,8 @@ c4.markdown(f"<div class='metric-card' style='border-left-color:var(--warn);'><d
 
 st.markdown("<hr class='section-divider'>", unsafe_allow_html=True)
 
-tab0,tab2,tab3,tab4 = st.tabs([
-    "🏆 Weekly Results","📊 Penalty Matrix","🔢 All Combinations","👥 Players"
+tab0,tab4,tab2,tab3= st.tabs([
+    "🏆 Weekly Results","👥 Players","📊 Penalty Matrix","🔢 All Combinations"
 ])
 
 
@@ -844,7 +844,7 @@ with tab3:
 
 # ═══ TAB 4 — Players ══════════════════════════════════════════════════════════
 with tab4:
-    st.markdown("## Players")
+    st.markdown("## Player standings")
     ca, cb = st.columns([3,2])
 
     with ca:
@@ -852,7 +852,8 @@ with tab4:
         du = du[['name','rank']]
         du['rank_adjusted'] = du.apply(lambda x: rank_to_int(x,hist,cap=False) - won_games(x,hist)//2,axis=1)
 
-        st.dataframe(du[PLAYERS_COLS], use_container_width=True)
+        print(du)
+        st.dataframe(du, use_container_width=True)
 
     st.markdown("---")
 
