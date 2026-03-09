@@ -100,8 +100,10 @@ KYU_RANKS = [f"{k}k" for k in range(30, 0, -1)]
 DAN_RANKS = [f"{d}d" for d in range(1, 10)]
 ALL_RANKS = KYU_RANKS + DAN_RANKS  # 30k(idx0,val1) … 9d(idx38,val39)
 
-def won_games(player: dict,hist: dict) -> int:
-  return (hist.winner==player['name']).size
+def won_games(player: dict,hist) -> int:
+  print(type(hist)) 
+
+  return len(hist[hist['winner'] == player['name']])
   
 # ═══════════════════════════════════════════════════════════════════════════════
 
