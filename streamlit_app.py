@@ -859,4 +859,4 @@ with tab4:
     st.markdown("---")
 
     #main print here
-    st.write(dict(st.session_state))
+    st.write(hist)
