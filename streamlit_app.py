@@ -109,9 +109,9 @@ def rank_to_int(player: dict,hist: dict,cap=True) -> int:
 
   r = player['rank']
   if cap:
-    return max(10,ALL_RANKS.index(str(r)) + 1) -  won_games(player,hist)/2
+    return max(10,ALL_RANKS.index(str(r)) + 1) +  won_games(player,hist)/2
   else:
-    return (ALL_RANKS.index(str(r)) + 1) -  won_games(player,hist)/2
+    return (ALL_RANKS.index(str(r)) + 1) + won_games(player,hist)/2
 
 def rank_display(r: str) -> str:
     css = "rank-dan" if str(r).endswith("d") else "rank-kyu"
