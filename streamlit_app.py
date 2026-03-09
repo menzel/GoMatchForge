@@ -850,9 +850,10 @@ with tab4:
     with ca:
         du = users.copy(); du.index = range(1,len(du)+1)
         du = du[['name','rank']]
-        du['rank_adjusted'] = du.apply(lambda x: rank_to_int(x,hist,cap=False) - won_games(x,hist)//2,axis=1)
+        du['rank_adjusted'] = du.apply(lambda x: rank_to_int(x,hist,cap=False),axis=1)
+        du['wins'] = du.apply(lambda x: won_games(x,hist),axis=1)
+        du = du.sort_values(by='rank_adjusted')
 
-        print(du)
         st.dataframe(du, use_container_width=True)
 
     st.markdown("---")
