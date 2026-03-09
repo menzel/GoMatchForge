@@ -841,40 +841,15 @@ with tab3:
 
 # ═══ TAB 4 — Players ══════════════════════════════════════════════════════════
 with tab4:
-    st.markdown("## Player Roster")
+    st.markdown("## Players")
     ca, cb = st.columns([3,2])
+
     with ca:
         du = users.copy(); du.index = range(1,len(du)+1)
+        du = du[['name','rank']]
+        du['rank'] = du.apply(lambda x: x['rank'] - won_games(x,hist)//2,axis=1)
+
         st.dataframe(du[PLAYERS_COLS], use_container_width=True)
-    with cb:
-        st.markdown("### Google Sheets Config")
-        load_status = st.session_state.get("gs_load_status","offline")
-        if load_status == "ok":
-            st.success("Connected to Google Sheets. Data loaded on startup.")
-        elif load_status == "offline":
-            st.info("Running in offline/demo mode. Configure `.streamlit/secrets.toml` to connect.")
-        else:
-            st.error(f"Sheets error: {load_status}")
-
-        st.markdown("""<div class='info-box' style='margin-top:.8rem;line-height:1.8;'>
-            <strong style='color:var(--text)'>secrets.toml structure:</strong><br>
-            [gcp_service_account]<br>
-            type = "service_account"<br>
-            project_id = "..."<br>
-            private_key = "..."<br>
-            client_email = "..."<br>
-            ...<br><br>
-            [sheets]<br>
-            spreadsheet_id = "YOUR_ID"
-        </div>""", unsafe_allow_html=True)
-
-        st.markdown("### Go Rank Scale")
-        st.markdown("""<div class='info-box' style='line-height:2;'>
-            <span class='rank-kyu'>30k</span> worst → <span class='rank-kyu'>1k</span>
-            &nbsp;|&nbsp;
-            <span class='rank-dan'>1d</span> → <span class='rank-dan'>9d</span> best<br>
-            30k=1 … 1k=30, 1d=31 … 9d=39
-        </div>""", unsafe_allow_html=True)
 
     st.markdown("---")
 
