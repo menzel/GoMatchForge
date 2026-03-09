@@ -101,8 +101,6 @@ DAN_RANKS = [f"{d}d" for d in range(1, 10)]
 ALL_RANKS = KYU_RANKS + DAN_RANKS  # 30k(idx0,val1) … 9d(idx38,val39)
 
 def won_games(player: dict,hist) -> int:
-  print(type(hist)) 
-
   return len(hist[hist['winner'] == player['name']])
   
 # ═══════════════════════════════════════════════════════════════════════════════
@@ -852,13 +850,13 @@ with tab4:
     with ca:
         du = users.copy(); du.index = range(1,len(du)+1)
         du = du[['name','rank']]
-        du['rank_adjusted'] = du.apply(lambda x: rank_to_int(x,hist,cap=False),axis=1)
         du['wins'] = du.apply(lambda x: won_games(x,hist),axis=1)
-        du = du.sort_values(by='rank_adjusted')
+        du['rank_adjusted'] = du.apply(lambda x: rank_to_int(x,hist,cap=False),axis=1)
+        du = du.sort_values(by='rank_adjusted',ascending=False)
 
         st.dataframe(du, use_container_width=True)
 
     st.markdown("---")
 
     #main print here
-    st.write(hist)
+    #st.write(hist)
