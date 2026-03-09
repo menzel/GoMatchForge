@@ -105,10 +105,13 @@ def won_games(player: dict,hist: dict) -> int:
   
 # ═══════════════════════════════════════════════════════════════════════════════
 
-def rank_to_int(player: dict,hist: dict) -> int:
+def rank_to_int(player: dict,hist: dict,cap=True) -> int:
 
   r = player['rank']
-  return max(10,ALL_RANKS.index(str(r)) + 1) -  won_games(player,hist)//2
+  if cap:
+    return max(10,ALL_RANKS.index(str(r)) + 1) -  won_games(player,hist)//2
+  else:
+    return (ALL_RANKS.index(str(r)) + 1) -  won_games(player,hist)//2
 
 def rank_display(r: str) -> str:
     css = "rank-dan" if str(r).endswith("d") else "rank-kyu"
@@ -847,7 +850,7 @@ with tab4:
     with ca:
         du = users.copy(); du.index = range(1,len(du)+1)
         du = du[['name','rank']]
-        du['rank'] = du.apply(lambda x: x['rank'] - won_games(x,hist)//2,axis=1)
+        du['rank_adjusted'] = du.apply(lambda x: rank_to_int(x,hist,cap=False) - won_games(x,hist)//2,axis=1)
 
         st.dataframe(du[PLAYERS_COLS], use_container_width=True)
 
