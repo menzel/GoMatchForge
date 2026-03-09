@@ -860,7 +860,7 @@ with tab4:
         du['rank_adjusted'] = du.apply(lambda x: rank_to_int(x,hist,cap=False),axis=1)
         du = du.sort_values(by='rank_adjusted',ascending=False)
 
-        st.dataframe(du[['name','rank']], use_container_width=True)
+        st.dataframe(du[['name','rank','wins']], use_container_width=True)
 
     st.markdown("---")
 
