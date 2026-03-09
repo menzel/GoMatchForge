@@ -560,7 +560,6 @@ with st.sidebar:
     def check_key(key,players):
         print(key)
         print(players)
-        print(users)
         return False
 
     # ── Log game result
@@ -584,22 +583,26 @@ with st.sidebar:
             url_in    = st.text_input("Game URL", value=sel_row.url)
             key_in    = st.text_input("Player key", value=sel_row.url)
 
-            if not check_key(key_in,[sel_row.player1, sel_row.player2]):
-                st.error("Invalid key",[sel_row.player1, sel_row.player2])
+            r_sub  = st.form_submit_button("SAVE RESULT",type="primary")
 
-            r_sub     = st.form_submit_button("SAVE RESULT",type="primary")
+
             if r_sub:
-                if winner_in != "(pending)":
-                    st.session_state.history.at[sel_idx, "winner"] = winner_in
-                    for pn in [sel_row.player1, sel_row.player2]:
-                        mask = st.session_state.users["name"] == pn
-                       # st.session_state.users.loc[mask, "last_active"] = sel_row.week_date
-                    push_players()
-                if url_in:
-                    st.session_state.history.at[sel_idx, "url"] = url_in
-                update_game_row_in_sheet(sel_idx)
-                st.success("Result saved!")
-                st.rerun()
+
+                if not check_key(key_in,[sel_row.player1, sel_row.player2]):
+                    st.error("Invalid key",[sel_row.player1, sel_row.player2])
+                else:
+
+                    if winner_in != "(pending)":
+                        st.session_state.history.at[sel_idx, "winner"] = winner_in
+                        for pn in [sel_row.player1, sel_row.player2]:
+                            mask = st.session_state.users["name"] == pn
+                           # st.session_state.users.loc[mask, "last_active"] = sel_row.week_date
+                        push_players()
+                    if url_in:
+                        st.session_state.history.at[sel_idx, "url"] = url_in
+                    update_game_row_in_sheet(sel_idx)
+                    st.success("Result saved!")
+                    st.rerun()
     else:
         st.info("No pending games.")
 
