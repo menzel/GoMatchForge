@@ -584,7 +584,7 @@ with st.sidebar:
             url_in    = st.text_input("Game URL", value=sel_row.url)
             key_in    = st.text_input("Player key", value=sel_row.url)
 
-            if not check_key(key_in,):
+            if not check_key(key_in,[sel_row.player1, sel_row.player2]):
                 st.error("Invalid key",[sel_row.player1, sel_row.player2])
 
             r_sub     = st.form_submit_button("SAVE RESULT",type="primary")
