@@ -564,6 +564,7 @@ with st.sidebar:
 
         users = st.session_state.users
         users = users[users['name'].isin(players)]
+        print(users)
         print(key,users['key'].to_list())
         return key in users['key'].to_list()
 
