@@ -148,6 +148,7 @@ def _get_gspread_client():
     except KeyError:
         return None, "No [gcp_service_account] found in .streamlit/secrets.toml"
     except Exception as e:
+        print(e)
         return None, str(e)
 
 
@@ -158,6 +159,7 @@ def _get_spreadsheet(client):
     except KeyError:
         return None, "No [sheets] spreadsheet_id in secrets.toml"
     except Exception as e:
+        print(e)
         return None, str(e)
 
 
@@ -172,7 +174,6 @@ def gs_load_players(client) -> tuple[pd.DataFrame | None, str | None]:
         df = pd.DataFrame(data)
         # Coerce types
         df["timezone"] = pd.to_numeric(df["timezone"], errors="coerce").fillna(0).astype(int)
-        print(df)
         for col in ["name", "rank", "status", "key"]:
             if col not in df.columns: df[col] = ""
         return df[PLAYERS_COLS], None
@@ -196,6 +197,7 @@ def gs_load_games(client) -> tuple[pd.DataFrame | None, str | None]:
         df["year"] = pd.to_numeric(df["year"], errors="coerce").fillna(0).astype(int)
         return df[GAMES_COLS], None
     except Exception as e:
+        print(e)
         return None, str(e)
 
 
@@ -209,6 +211,7 @@ def gs_write_players(client, df: pd.DataFrame) -> str | None:
         ws.update(rows, value_input_option="RAW")
         return None
     except Exception as e:
+        print(e)
         return str(e)
 
 
@@ -227,6 +230,7 @@ def gs_append_games(client, new_rows: pd.DataFrame) -> str | None:
             ws.append_row(row, value_input_option="RAW")
         return None
     except Exception as e:
+        print(e)
         return str(e)
 
 
@@ -242,6 +246,7 @@ def gs_update_game_row(client, games_df: pd.DataFrame, row_index_in_df: int) -> 
         ws.update(f"A{sheet_row}", [row_data], value_input_option="RAW")
         return None
     except Exception as e:
+        print(e)
         return str(e)
 
 
@@ -256,6 +261,7 @@ def gs_write_all_games(client, df: pd.DataFrame) -> str | None:
         ws.update(rows, value_input_option="RAW")
         return None
     except Exception as e:
+        print(e)
         return str(e)
 
 
