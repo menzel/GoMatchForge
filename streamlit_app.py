@@ -851,18 +851,35 @@ with tab3:
 # ═══ TAB 4 — Players ══════════════════════════════════════════════════════════
 with tab4:
     st.markdown("## Player standings")
-    ca, cb = st.columns([3,2])
+    #ca, cb = st.columns([3,2])
 
-    with ca:
-        du = users.copy(); du.index = range(1,len(du)+1)
-        du = du[['name','rank']]
-        du['wins'] = du.apply(lambda x: won_games(x,hist),axis=1)
-        du['rank_adjusted'] = du.apply(lambda x: rank_to_int(x,hist,cap=False),axis=1)
-        du = du.sort_values(by='rank_adjusted',ascending=False)
+    du = users.copy(); du.index = range(1,len(du)+1)
+    du = du[['name','rank']]
+    du['wins'] = du.apply(lambda x: won_games(x,hist),axis=1)
+    du['rank_adjusted'] = du.apply(lambda x: rank_to_int(x,hist,cap=False),axis=1)
+    du = du.sort_values(by='rank_adjusted',ascending=False)
+    du = du[['name','rank','wins']]
+    
+    weeks = hist['week'].unique()
 
-        st.dataframe(du[['name','rank','wins']], use_container_width=True)
+    for week in weeks:
+        du["W"+str(week)] = "-"
+ 
+    for i,player in du.iterrows():
+        for week in weeks:
+            sub = hist[(hist['week'] == week)&((hist['player1'] == player['name'])|(hist['player2'] == player['name']))]
 
-    st.markdown("---")
+            if len(sub) > 0:
+                sub = sub.iloc[0]
+                other_player = list(set([sub['player1'],sub['player2']]) - set([player['name']]))[0] # get other player
+                if sub['winner'] == player['name']:
+                    du.at[i,"W"+str(week)] = "W/"+other_player
+                else:
+                    du.at[i,"W"+str(week)] = "L/"+other_player
+            else:
+                du.at[i,"W"+str(week)] = "-" 
+
+    st.dataframe(du, use_container_width=True)
 
     #main print here
     #st.write(hist)
