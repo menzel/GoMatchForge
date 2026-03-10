@@ -176,6 +176,7 @@ def gs_load_players(client) -> tuple[pd.DataFrame | None, str | None]:
             if col not in df.columns: df[col] = ""
         return df[PLAYERS_COLS], None
     except Exception as e:
+        print(e)
         return None, str(e)
 
 
