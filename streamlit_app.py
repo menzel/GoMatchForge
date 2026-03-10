@@ -124,7 +124,7 @@ def rank_display(r: str) -> str:
 PLAYERS_SHEET = "Players"
 GAMES_SHEET   = "Games"
 
-PLAYERS_COLS = ["name", "timezone", "rank", "status", "timezone_matters"]
+PLAYERS_COLS = ["name", "timezone", "rank", "status", "timezone_matters",'key']
 GAMES_COLS   = ["player1", "player2", "winner", "url", "week_date", "week", "year"]
 
 
@@ -564,6 +564,7 @@ with st.sidebar:
 
         users = st.session_state.users
         users = users[users['name'].isin(players)]
+        print(key,users['key'].to_list())
         return key in users['key'].to_list()
 
     # ── Log game result
@@ -866,7 +867,7 @@ with tab4:
     weeks = hist['week'].unique()
 
     for week in weeks:
-        du["W"+str(week)] = "-"
+        du["W"+str(week+1)] = "-"
  
     for i,player in du.iterrows():
         for week in weeks:
@@ -876,13 +877,13 @@ with tab4:
                 sub = sub.iloc[0]
                 other_player = list(set([sub['player1'],sub['player2']]) - set([player['name']]))[0] # get other player
                 if sub['winner'] == "": #game not played (yet) 
-                    du.at[i,"W"+str(week)] = "-"
+                    du.at[i,"W"+str(week+1)] = "-"
                 elif sub['winner'] == player['name']:
-                    du.at[i,"W"+str(week)] = "W/"+other_player
+                    du.at[i,"W"+str(week+1)] = "W/"+other_player
                 else:
-                    du.at[i,"W"+str(week)] = "L/"+other_player
+                    du.at[i,"W"+str(week+1)] = "L/"+other_player
             else:
-                du.at[i,"W"+str(week)] = "-" 
+                du.at[i,"W"+str(week+1)] = "-" 
 
     st.dataframe(du, use_container_width=True)
 
