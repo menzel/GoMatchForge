@@ -174,7 +174,7 @@ def gs_load_players(client) -> tuple[pd.DataFrame | None, str | None]:
         df = pd.DataFrame(data)
         # Coerce types
         df["timezone"] = pd.to_numeric(df["timezone"], errors="coerce").fillna(0).astype(int)
-        for col in ["name", "rank", "status", "key"]:
+        for col in ["name", "rank", "status"]:
             if col not in df.columns: df[col] = ""
         return df[PLAYERS_COLS], None
     except Exception as e:
@@ -657,7 +657,7 @@ with st.sidebar:
         wnum   = week_num(sun)
         wyear  = sun.year
 
-        if False: #pw != st.secrets["sheets"]["password"]:
+        if pw != st.secrets["sheets"]["password"]:
           time.sleep(1)
           st.write("Wrong password")
         else:
