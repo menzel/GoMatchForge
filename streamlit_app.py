@@ -482,7 +482,7 @@ DEFAULT_GAMES = pd.DataFrame([
     {"player1":"Carlos","player2":"Alice","winner":"","url":"","week_date":iso(_ps),"week":week_num(_ps),"year":_ps.year}
 ])
 
-st.secrets = {"sheets":{"password":'1234'}}
+#st.secrets = {"sheets":{"password":'1234'}}
 
 
 # ═══════════════════════════════════════════════════════════════════════════════
