@@ -872,7 +872,7 @@ with tab4:
             if len(sub) > 0:
                 sub = sub.iloc[0]
                 other_player = list(set([sub['player1'],sub['player2']]) - set([player['name']]))[0] # get other player
-                if sub['winner'] == "" #game not played (yet) 
+                if sub['winner'] == "": #game not played (yet) 
                     du.at[i,"W"+str(week)] = "-"
                 elif sub['winner'] == player['name']:
                     du.at[i,"W"+str(week)] = "W/"+other_player
