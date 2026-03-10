@@ -124,7 +124,7 @@ def rank_display(r: str) -> str:
 PLAYERS_SHEET = "Players"
 GAMES_SHEET   = "Games"
 
-PLAYERS_COLS = ["name", "timezone", "rank", "status", "timezone_matters"]#,"key"]
+PLAYERS_COLS = ["name", "timezone", "rank", "status", "timezone_matters","key"]
 GAMES_COLS   = ["player1", "player2", "winner", "url", "week_date", "week", "year"]
 
 
