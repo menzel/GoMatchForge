@@ -471,8 +471,10 @@ DEFAULT_USERS = pd.DataFrame([
 
 DEFAULT_GAMES = pd.DataFrame([
     {"player1":"Alice","player2":"Bob",   "winner":"Alice","url":"https://online-go.com/game/1001","week_date":iso(_ps),"week":week_num(_ps),"year":_ps.year},
-    {"player1":"Carlos","player2":"Alice","winner":"Alice","url":"https://online-go.com/game/1002","week_date":iso(_ps),"week":week_num(_ps),"year":_ps.year}
+    {"player1":"Carlos","player2":"Alice","winner":"","url":"","week_date":iso(_ps),"week":week_num(_ps),"year":_ps.year}
 ])
+
+st.secrets = {"sheets":{"password":'1234'}}
 
 
 # ═══════════════════════════════════════════════════════════════════════════════
@@ -559,9 +561,10 @@ with st.sidebar:
 
     def check_key(key,players):
         #TODO get user list and compare key to any of the two players
-        print(key)
-        print(players)
-        return False
+
+        users = st.session_state.users
+        users = users[users['name'].isin(players)]
+        return key in users['key'].to_list()
 
     # ── Log game result
     st.markdown("### Log Game Result")
