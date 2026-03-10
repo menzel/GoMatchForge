@@ -172,7 +172,7 @@ def gs_load_players(client) -> tuple[pd.DataFrame | None, str | None]:
         df = pd.DataFrame(data)
         # Coerce types
         df["timezone"] = pd.to_numeric(df["timezone"], errors="coerce").fillna(0).astype(int)
-        for col in ["name", "rank", "status"]:
+        for col in ["name", "rank", "status", "key"]:
             if col not in df.columns: df[col] = ""
         return df[PLAYERS_COLS], None
     except Exception as e:
