@@ -84,7 +84,8 @@ h3{ font-family:'DM Mono',monospace; font-size:1rem!important; color:var(--accen
 
 /* ── Match card: semi-transparent tint fading right — works on any background ── */
 .match-card{ background:transparent; border:none; border-radius:6px; padding:0.2rem 0.6rem; margin-bottom:.75rem; }
-.match-card.scheduled{ background:linear-gradient(to right, rgba(128,128,128,.8) 59%, transparent); }
+.match-card.scheduled{ background:linear-gradient(to right, rgba(218, 249, 226, 0.8) 9%, transparent); }
+
 .match-card.best{ background:linear-gradient(to right, rgba(232,255,71,.08) 60%, transparent); }
 .match-card.has-winner{ background:linear-gradient(to right, rgba(71,255,176,.5) 59%, transparent); }
 .match-top{ display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:.5rem; }
@@ -101,7 +102,7 @@ h3{ font-family:'DM Mono',monospace; font-size:1rem!important; color:var(--accen
 .match-meta{ margin-top:.5rem; display:flex; gap:1rem; align-items:center; flex-wrap:wrap; }
 .match-url{ font-family:'DM Mono',monospace; font-size:.75rem; color:var(--accent); text-decoration:none; }
 .match-url:hover{ text-decoration:underline; }
-.winner-badge{ font-family:'DM Mono',monospace; font-size:.75rem; padding:.2rem .6rem; background:rgba(71,255,176,.35); color:var(--good); border-radius:100px; }
+.winner-badge{ font-family:'DM Mono',monospace; font-size:.75rem; padding:.2rem .6rem; background:rgba(71,255,176,.35); border-radius:100px; }
 .pending-badge{ font-family:'DM Mono',monospace; font-size:.75rem; padding:.2rem .6rem; background:rgba(128,128,128,.35); color:var(--muted); border-radius:100px; }
 .week-header{ font-family:'Bebas Neue',sans-serif; font-size:1.5rem; letter-spacing:2px; color:var(--accent2); border-bottom:1px solid var(--border); padding-bottom:.4rem; margin:1.5rem 0 .8rem; }
 .rank-kyu{ font-family:'DM Mono',monospace; font-size:.75rem; padding:.15rem .5rem; border-radius:4px; background:rgb(167,139,250); color:var(--kyu); }
