@@ -42,30 +42,56 @@ st.set_page_config(
 st.markdown("""
 <style>
 @import url('https://fonts.googleapis.com/css2?family=Bebas+Neue&family=DM+Mono:wght@400;500&family=DM+Sans:wght@300;400;500&display=swap');
+
+/* ── Semantic colour tokens — dark base ── */
 :root {
-    --bg:#0a0a0f; --surface:#13131a; --surface2:#1c1c28;
-    --accent:#e8ff47; --accent2:#ff6b35;
+    --accent:#ffc744; --accent2:#ff6b35; --heading:#ff6b35;
     --text:#e8e8f0; --muted:#6b6b80; --border:#2a2a38;
     --good:#47ffb0; --warn:#ffcc47; --bad:#ff4757;
-    --kyu:#a78bfa; --dan:#fbbf24;
+    --kyu:#fff; --dan:#fff;
+    /* match-card uses a neutral dark tint that fades well */
+    --match-tint: rgba(255,255,255,0.06);
 }
-html,body,[class*="css"]{ background:var(--bg); color:var(--text); font-family:'DM Sans',sans-serif; }
-.stApp{ background:var(--bg); }
-h1{ font-family:'Bebas Neue',sans-serif; font-size:4rem!important; letter-spacing:4px; color:var(--accent)!important; line-height:1!important; }
-h2{ font-family:'Bebas Neue',sans-serif; font-size:2.2rem!important; letter-spacing:2px; color:var(--text)!important; }
+
+/* ── Light mode: swap only the semantic tokens, leave backgrounds to Streamlit ── */
+@media (prefers-color-scheme: light) { :root {
+    --accent:#ffc744; --accent2:#bb3300; --heading:#1a1a2e;
+    --text:#1a1a2e; --muted:#777788; --border:#c8c8d0;
+    --good:#1a8f5e; --warn:#b07000; --bad:#bb1122;
+    --kyu:#fff; --dan:#fff;
+    --match-tint: rgba(0,0,0,0.05);
+}}
+[data-baseweb] [data-theme="light"], .stApp[data-theme="light"] { 
+    --accent:#ffc744; --accent2:#bb3300; --heading:#1a1a2e;
+    --text:#1a1a2e; --muted:#777788; --border:#c8c8d0;
+    --good:#1a8f5e; --warn:#b07000; --bad:#bb1122;
+    --kyu:#fff; --dan:#fff;
+    --match-tint: rgba(0,0,0,0.05);
+}
+
+/* ── Typography — no background overrides, Streamlit owns those ── */
+html,body,[class*="css"]{ font-family:'DM Sans',sans-serif; }
+h1{ font-family:'Bebas Neue',sans-serif; font-size:4rem!important; letter-spacing:4px; color:var(--heading)!important; line-height:1!important; }
+h2{ font-family:'Bebas Neue',sans-serif; font-size:2.2rem!important; letter-spacing:2px; }
 h3{ font-family:'DM Mono',monospace; font-size:1rem!important; color:var(--accent2)!important; text-transform:uppercase; letter-spacing:1px; }
 .hero-sub{ font-family:'DM Mono',monospace; color:var(--muted); font-size:.85rem; letter-spacing:2px; text-transform:uppercase; margin-top:-1rem; margin-bottom:2rem; }
-.metric-card{ background:var(--surface); border:1px solid var(--border); border-radius:4px; padding:1.2rem 1.5rem; border-left:3px solid var(--accent); }
+
+/* ── Metric cards: use currentColor-relative backgrounds so they work on any bg ── */
+.metric-card{ background:rgba(128,128,128,.08); border:1px solid var(--border); border-radius:4px; padding:1.2rem 1.5rem; border-left:3px solid var(--accent); }
 .metric-card .label{ font-family:'DM Mono',monospace; font-size:.7rem; color:var(--muted); text-transform:uppercase; letter-spacing:1.5px; }
 .metric-card .value{ font-family:'Bebas Neue',sans-serif; font-size:2.5rem; color:var(--accent); line-height:1.1; }
 .section-divider{ border:none; border-top:1px solid var(--border); margin:2rem 0; }
-.match-card{ background:var(--surface2); border:1px solid var(--border); border-radius:6px; padding:0.2rem 0.2rem; margin-bottom:.75rem; }
-.match-card.best{ border-color:var(--accent); background:rgba(232,255,71,.04); }
-.match-card.has-winner{ border-color:var(--good); }
+
+/* ── Match card: semi-transparent tint fading right — works on any background ── */
+.match-card{ background:transparent; border:none; border-radius:6px; padding:0.2rem 0.6rem; margin-bottom:.75rem; }
+.match-card.scheduled{ background:linear-gradient(to right, rgba(128,128,128,.8) 59%, transparent); }
+.match-card.best{ background:linear-gradient(to right, rgba(232,255,71,.08) 60%, transparent); }
+.match-card.has-winner{ background:linear-gradient(to right, rgba(71,255,176,.5) 59%, transparent); }
 .match-top{ display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:.5rem; }
 .match-players{ display:flex; align-items:center; }
 .match-player{ font-family:'DM Mono',monospace; font-weight:500; font-size:1rem; }
-.match-player.winner{ color:var(--good); }
+@media (prefers-color-scheme: dark) { .match-player.winner{ color:#000; } }
+@media (prefers-color-scheme: light) { .match-player.winner{ color:#000; } }
 .match-player.loser{ color:var(--muted); text-decoration:line-through; }
 .vs{ color:var(--muted); font-family:'Bebas Neue',sans-serif; font-size:1.4rem; margin:0 .8rem; }
 .penalty-badge{ font-family:'DM Mono',monospace; font-size:.8rem; padding:.3rem .8rem; border-radius:100px; font-weight:500; }
@@ -75,13 +101,13 @@ h3{ font-family:'DM Mono',monospace; font-size:1rem!important; color:var(--accen
 .match-meta{ margin-top:.5rem; display:flex; gap:1rem; align-items:center; flex-wrap:wrap; }
 .match-url{ font-family:'DM Mono',monospace; font-size:.75rem; color:var(--accent); text-decoration:none; }
 .match-url:hover{ text-decoration:underline; }
-.winner-badge{ font-family:'DM Mono',monospace; font-size:.75rem; padding:.2rem .6rem; background:rgba(71,255,176,.15); color:var(--good); border-radius:100px; }
-.pending-badge{ font-family:'DM Mono',monospace; font-size:.75rem; padding:.2rem .6rem; background:rgba(107,107,128,.2); color:var(--muted); border-radius:100px; }
+.winner-badge{ font-family:'DM Mono',monospace; font-size:.75rem; padding:.2rem .6rem; background:rgba(71,255,176,.35); color:var(--good); border-radius:100px; }
+.pending-badge{ font-family:'DM Mono',monospace; font-size:.75rem; padding:.2rem .6rem; background:rgba(128,128,128,.35); color:var(--muted); border-radius:100px; }
 .week-header{ font-family:'Bebas Neue',sans-serif; font-size:1.5rem; letter-spacing:2px; color:var(--accent2); border-bottom:1px solid var(--border); padding-bottom:.4rem; margin:1.5rem 0 .8rem; }
-.rank-kyu{ font-family:'DM Mono',monospace; font-size:.75rem; padding:.15rem .5rem; border-radius:4px; background:rgba(167,139,250,.15); color:var(--kyu); }
-.rank-dan{ font-family:'DM Mono',monospace; font-size:.75rem; padding:.15rem .5rem; border-radius:4px; background:rgba(251,191,36,.15); color:var(--dan); }
+.rank-kyu{ font-family:'DM Mono',monospace; font-size:.75rem; padding:.15rem .5rem; border-radius:4px; background:rgb(167,139,250); color:var(--kyu); }
+.rank-dan{ font-family:'DM Mono',monospace; font-size:.75rem; padding:.15rem .5rem; border-radius:4px; background:rgb(251,148,0); color:var(--dan); }
 [data-testid="stDataFrame"]{ border:1px solid var(--border); border-radius:6px; }
-[data-testid="stSidebar"]{ background:var(--surface); border-right:1px solid var(--border); }
+[data-testid="stSidebar"]{ border-right:1px solid var(--border); }
 .stButton>button{ background:#939393; color:#0a0a0f; border:none; font-family:'Bebas Neue',sans-serif; font-size:1.1rem; letter-spacing:2px; padding:.6rem 2rem; border-radius:3px; transition:opacity .2s; width:100%; }
 .stButton>button:hover{ opacity:.85; }
 .info-box{ background:var(--surface2); border:1px solid var(--border); border-left:3px solid var(--accent2); border-radius:4px; padding:.9rem 1.2rem; font-family:'DM Mono',monospace; font-size:.8rem; color:var(--muted); margin-bottom:1rem; }
@@ -91,6 +117,7 @@ h3{ font-family:'DM Mono',monospace; font-size:1rem!important; color:var(--accen
 .gs-off{ background:rgba(107,107,128,.2); color:var(--muted); }
 </style>
 """, unsafe_allow_html=True)
+
 
 
 # ═══════════════════════════════════════════════════════════════════════════════
@@ -125,7 +152,7 @@ PLAYERS_SHEET = "Players"
 GAMES_SHEET   = "Games"
 
 PLAYERS_COLS = ["name", "timezone", "rank", "status", "timezone_matters","key"]
-GAMES_COLS   = ["player1", "player2", "winner", "url", "week_date", "week", "year"]
+GAMES_COLS   = ["player1", "player2", "winner", "url", "week_date", "week", "year","scheduled"]
 
 
 def _get_gspread_client():
@@ -478,8 +505,9 @@ DEFAULT_USERS = pd.DataFrame([
 ])
 
 DEFAULT_GAMES = pd.DataFrame([
-    {"player1":"Alice","player2":"Bob",   "winner":"Alice","url":"https://online-go.com/game/1001","week_date":iso(_ps),"week":week_num(_ps),"year":_ps.year},
-    {"player1":"Carlos","player2":"Alice","winner":"","url":"","week_date":iso(_ps),"week":week_num(_ps),"year":_ps.year}
+    {"player1":"Alice","player2":"Bob",   "winner":"Alice","url":"https://online-go.com/game/1001","week_date":iso(_ps),"week":week_num(_ps),"year":_ps.year, "scheduled": 'yes'},
+    {"player1":"Carlos","player2":"Alice","winner":"","url":"","week_date":iso(_ps),"week":week_num(_ps),"year":_ps.year, "scheduled": 'yes'},
+    {"player1":"Carlos","player2":"FOO","winner":"","url":"","week_date":iso(_ps),"week":week_num(_ps),"year":_ps.year, "scheduled": 0}
 ])
 
 #st.secrets = {"sheets":{"password":'1234'}}
@@ -593,7 +621,7 @@ with st.sidebar:
         sel_row  = hist.loc[sel_idx]
 
         with st.form("log_result", clear_on_submit=True):
-            winner_in = st.selectbox("Winner", [sel_row.player1, sel_row.player2])
+            winner_in = st.selectbox("Winner", [sel_row.player1, sel_row.player2]) 
             url_in    = st.text_input("Game URL", value=sel_row.url)
             key_in    = st.text_input("Player key", value=sel_row.url)
 
@@ -739,7 +767,7 @@ c4.markdown(f"<div class='metric-card' style='border-left-color:var(--warn);'><d
 st.markdown("<hr class='section-divider'>", unsafe_allow_html=True)
 
 tab0,tab4,tab2,tab3= st.tabs([
-    "🏆 Weekly Results","👥 Players","📊 Penalty Matrix","🔢 All Combinations"
+    "🏆 Weekly Results","👥 Players","📊 Game Matrix","🔢 All Combinations"
 ])
 
 
@@ -786,7 +814,7 @@ with tab0:
             wgames = wgames.sort_values(by='first_user_rank',ascending=False)
             print(wgames)
 
-            for _, g in wgames.iterrows():
+            for row_idx, g in wgames.iterrows():
                 p1,p2   = g.player1, g.player2
                 winner  = g.winner
                 url     = g.url
@@ -794,40 +822,61 @@ with tab0:
                 r1,r2    = get_rank(p1), get_rank(p2)
                 p1_cls   = "winner" if winner==p1 else ("loser" if winner else "")
                 p2_cls   = "winner" if winner==p2 else ("loser" if winner else "")
-                card_cls = "has-winner" if winner else ""
+                scheduled = g.get("scheduled", "") == "yes"
+                card_cls = "has-winner" if winner else ("scheduled" if scheduled else "")
 
-                winner_html = (
-                    f"<span class='winner-badge'>🏆 {winner}</span>" if winner
-                    else "<span class='pending-badge'>⏳ Pending</span>"
-                )
                 url_html = (
                     f"<a class='match-url' href='{url}' target='_blank'>🔗 View game</a>"
                     if url else ""
                 )
 
-                st.markdown(f"""
-                <div class='match-card {card_cls}'>
-                    <div class='match-top'>
-                        <div class='match-players'>
-                            <span class=''>⚪</span>
-                            <span class='match-player {p1_cls}'>{p1}</span>
-                            <span style='margin:0 .4rem'>{rank_display(r1)}</span>
-                            <span class='vs'>VS</span>
-                            <span class=''>⚫</span>
-                            <span class='match-player {p2_cls}'>{p2}</span>
-                            <span style='margin:0 .4rem'>{rank_display(r2)}</span>
-                        </div>
-                        <div>{url_html}</div>
-                        <div>{winner_html}</div>
-                    </div>
-                </div>
-                """, unsafe_allow_html=True)
+                # Use st.columns so the native checkbox sits in the same visual row.
+                # col_players gets the styled name/rank HTML; col_url the game link;
+                # col_status gets either the winner badge, pending badge, or checkbox.
+                col_players, col_url, col_status = st.columns([5, 2, 2])
+
+                with col_players:
+                    st.markdown(
+                        f"<div class='match-card {card_cls}' style='margin-bottom:0'>"
+                        f"<span class=''>⚪</span> "
+                        f"<span class='match-player {p1_cls}'>{p1}</span> "
+                        f"<span style='margin:0 .3rem'>{rank_display(r1)}</span>"
+                        f"<span class='vs'>VS</span>"
+                        f"<span class=''>⚫</span> "
+                        f"<span class='match-player {p2_cls}'>{p2}</span> "
+                        f"<span style='margin:0 .3rem'>{rank_display(r2)}</span>"
+                        f"</div>",
+                        unsafe_allow_html=True
+                    )
+
+                with col_url:
+                    if url_html:
+                        st.markdown(url_html, unsafe_allow_html=True)
+
+                with col_status:
+                    if winner:
+                        st.markdown(
+                            f"<span class='winner-badge'>🏆 {winner}</span>",
+                            unsafe_allow_html=True
+                        )
+                    elif scheduled:
+                        new_val = st.checkbox("Scheduled", value=True, key=f"sched_{row_idx}")
+                        if not new_val:
+                            st.session_state.history.at[row_idx, "scheduled"] = ""
+                            update_game_row_in_sheet(row_idx)
+                            st.rerun()
+                    else:
+                        new_val = st.checkbox("Pending", value=False, key=f"sched_{row_idx}")
+                        if new_val:
+                            st.session_state.history.at[row_idx, "scheduled"] = "yes"
+                            update_game_row_in_sheet(row_idx)
+                            st.rerun()
 
 
 
 # ═══ TAB 2 — Penalty Matrix ═══════════════════════════════════════════════════
 with tab2:
-    st.markdown("## Penalty Matrix")
+    st.markdown("## Game Matrix")
     st.markdown("Active players only. Cell = total penalty for that pairing.")
     if len(active) < 2:
         st.warning("Need at least 2 active players.")
